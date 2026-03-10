@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real-Time Monitoring — Zero Eleven</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=Barlow+Condensed:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black: #0a0a0a;
+  --charcoal: #141414;
+  --ink: #1e1e1e;
+  --mid: #555;
+  --muted: #888;
+  --border: rgba(255,255,255,0.08);
+  --white: #ffffff;
+  --cream: #ede9e1;
+  --accent: #c8a96e;
+  --accent-dark: #a8893e;
+  --accent-light: #e8c98e;
+  --section-light: #f7f5f0;
+  --green-ok: rgba(52,211,153,0.8);
+  --amber-warn: rgba(251,191,36,0.8);
+  --red-alert: rgba(239,68,68,0.8);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--white);
+  color: var(--black);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--accent);
+}
+h1, h2, h3 { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; line-height: 1.05; }
+p { font-weight: 300; line-height: 1.7; color: var(--mid); }
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  padding: 0 3rem; height: 72px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(10,10,10,0.96); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { display: flex; align-items: center; gap: 1rem; text-decoration: none; }
+.nav-logo-text {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 1.4rem; font-weight: 700;
+  letter-spacing: 0.05em; color: var(--white); text-transform: uppercase;
+}
+.nav-back {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-size: 0.75rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.5); text-decoration: none; transition: color 0.2s;
+}
+.nav-back:hover { color: var(--accent); }
+.nav-cta-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1.4rem; background: var(--accent); color: var(--black);
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; transition: background 0.2s;
+}
+.nav-cta-btn:hover { background: var(--accent-light); }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.9rem 2rem; background: var(--accent); color: var(--black);
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+}
+.btn-primary:hover { background: var(--accent-light); transform: translateY(-2px); }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.9rem 2rem; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7);
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ══════════════════════════════════
+   HERO
+══════════════════════════════════ */
+.hero {
+  padding-top: 72px; min-height: 100vh;
+  background: var(--black);
+  display: grid; grid-template-columns: 1fr 1fr;
+  position: relative; overflow: hidden;
+}
+
+/* Pulse rings background */
+.hero::before {
+  content: '';
+  position: absolute;
+  bottom: -20%; right: -10%;
+  width: 900px; height: 900px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(200,169,110,0.03) 0%,
+    rgba(200,169,110,0.06) 25%,
+    transparent 60%
+  );
+  animation: hero-pulse 6s ease-in-out infinite;
+  pointer-events: none; z-index: 1;
+}
+@keyframes hero-pulse {
+  0%,100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+/* Data stream lines */
+.hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    90deg, transparent, transparent 119px, rgba(200,169,110,0.015) 120px
+  );
+  pointer-events: none; z-index: 1;
+}
+
+.hero-left {
+  position: relative; z-index: 2;
+  padding: 5rem 4rem 5rem 6rem;
+  display: flex; flex-direction: column; justify-content: center;
+}
+
+.hero-breadcrumb {
+  display: flex; align-items: center; gap: 0.75rem; margin-bottom: 3rem;
+}
+.hero-breadcrumb span {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem;
+  font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+}
+.bc-parent { color: rgba(255,255,255,0.3); }
+.bc-sep { color: rgba(255,255,255,0.15); }
+.bc-current { color: var(--accent); }
+
+.capability-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.4rem 1rem; border: 1px solid rgba(200,169,110,0.3);
+  margin-bottom: 2rem; width: fit-content;
+}
+.badge-dot {
+  width: 6px; height: 6px; background: var(--accent); border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+.capability-badge span {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem;
+  font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent);
+}
+
+.hero h1 {
+  font-size: clamp(2.8rem, 4.5vw, 5rem); color: var(--white);
+  text-transform: uppercase; margin-bottom: 1rem; line-height: 0.95;
+}
+.hero h1 em { display: block; font-style: italic; font-weight: 300; color: var(--accent); }
+.hero-subhead {
+  font-size: 1.1rem; font-weight: 300; color: rgba(255,255,255,0.5);
+  max-width: 440px; margin-bottom: 3rem; line-height: 1.65; font-style: italic;
+}
+
+.hero-metrics {
+  display: flex; gap: 2.5rem; margin-bottom: 3rem;
+  padding-top: 2rem; border-top: 1px solid var(--border); flex-wrap: wrap;
+}
+.hero-metric .hm-num {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 2.2rem;
+  font-weight: 800; color: var(--accent); line-height: 1;
+}
+.hero-metric .hm-label {
+  font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em;
+  text-transform: uppercase; color: rgba(255,255,255,0.3); margin-top: 0.3rem;
+}
+.hero-actions { display: flex; gap: 1rem; }
+
+/* Hero Right — Abstract live dashboard */
+.hero-right {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 5rem 4rem;
+}
+
+.live-dashboard {
+  width: 100%; max-width: 460px;
+  background: rgba(15,20,35,0.95);
+  border: 1px solid rgba(200,169,110,0.15);
+  font-family: 'Barlow Condensed', sans-serif;
+  overflow: hidden;
+}
+
+.ld-topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.6rem 1rem;
+  background: rgba(200,169,110,0.06);
+  border-bottom: 1px solid rgba(200,169,110,0.12);
+}
+.ld-title {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(200,169,110,0.7);
+}
+.ld-live {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--green-ok);
+}
+.ld-live-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--green-ok);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+/* KPI row */
+.ld-kpis {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px solid rgba(200,169,110,0.08);
+}
+.ld-kpi {
+  padding: 0.9rem 0.75rem;
+  border-right: 1px solid rgba(200,169,110,0.08);
+  text-align: center;
+}
+.ld-kpi:last-child { border-right: none; }
+.ld-kpi-val {
+  font-size: 1.3rem; font-weight: 800; line-height: 1; margin-bottom: 0.2rem;
+}
+.ld-kpi-val.green { color: var(--green-ok); }
+.ld-kpi-val.amber { color: var(--amber-warn); }
+.ld-kpi-val.blue { color: #60a5fa; }
+.ld-kpi-val.gold { color: var(--accent); }
+.ld-kpi-label { font-size: 0.5rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.25); }
+
+/* Mini sparkline chart */
+.ld-chart-area {
+  padding: 0.75rem 1rem 0.5rem;
+  border-bottom: 1px solid rgba(200,169,110,0.08);
+}
+.ld-chart-label {
+  font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(255,255,255,0.2); margin-bottom: 0.5rem;
+}
+.ld-chart svg { width: 100%; display: block; }
+
+/* Alert stream */
+.ld-alerts { padding: 0.5rem 0; }
+.ld-alert-item {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  animation: slide-in 0.4s ease;
+}
+@keyframes slide-in { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
+.ld-alert-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.ld-alert-dot.ok { background: var(--green-ok); }
+.ld-alert-dot.warn { background: var(--amber-warn); }
+.ld-alert-dot.crit { background: var(--red-alert); }
+.ld-alert-text { flex: 1; font-size: 0.58rem; letter-spacing: 0.04em; }
+.ld-alert-text.ok { color: rgba(52,211,153,0.7); }
+.ld-alert-text.warn { color: rgba(251,191,36,0.7); }
+.ld-alert-text.crit { color: rgba(239,68,68,0.7); }
+.ld-alert-time { font-size: 0.52rem; color: rgba(255,255,255,0.2); white-space: nowrap; }
+
+/* ══════════════════════════════════
+   DASHBOARD SHOWCASE (screenshot section)
+══════════════════════════════════ */
+.dashboard-section {
+  background: var(--section-light);
+  padding: 8rem 6rem;
+}
+
+.split-header {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+  align-items: end; margin-bottom: 5rem;
+}
+.split-header h2 { font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase; line-height: 1; color: var(--black); }
+.split-header p { font-size: 1rem; color: var(--muted); max-width: 420px; }
+
+.dashboard-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5px;
+  background: #d8d5ce; margin-bottom: 4rem;
+}
+
+.dash-panel {
+  background: var(--white); padding: 0;
+  overflow: hidden; transition: background 0.25s; position: relative;
+}
+.dash-panel:hover { background: var(--cream); }
+
+.dash-panel-image {
+  width: 100%; display: block;
+  aspect-ratio: 16/9; object-fit: cover;
+  filter: saturate(0.85) brightness(0.95);
+  transition: filter 0.4s;
+}
+.dash-panel:hover .dash-panel-image { filter: saturate(1) brightness(1); }
+
+.dash-panel-caption {
+  padding: 1.5rem 2rem;
+}
+.dash-panel-caption .dp-tag {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-dark); margin-bottom: 0.5rem;
+}
+.dash-panel-caption h3 {
+  font-size: 1.1rem; text-transform: uppercase; color: var(--black); margin-bottom: 0.5rem; line-height: 1.1;
+}
+.dash-panel-caption p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+/* Abstract placeholder panels */
+.dash-panel-abstract {
+  background: var(--black); padding: 2.5rem;
+  display: flex; flex-direction: column; justify-content: space-between;
+  min-height: 280px;
+}
+
+/* Geographic map abstract */
+.map-abstract {
+  position: relative; flex: 1; margin-bottom: 1.5rem;
+  border: 1px solid rgba(200,169,110,0.1);
+  overflow: hidden;
+  background: rgba(255,255,255,0.02);
+}
+.map-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(200,169,110,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,169,110,0.04) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.map-asset {
+  position: absolute;
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 1.5px solid;
+}
+.map-asset.ok { background: rgba(52,211,153,0.3); border-color: var(--green-ok); box-shadow: 0 0 10px rgba(52,211,153,0.3); }
+.map-asset.warn { background: rgba(251,191,36,0.3); border-color: var(--amber-warn); box-shadow: 0 0 10px rgba(251,191,36,0.3); animation: pulse 1.5s ease-in-out infinite; }
+.map-asset.crit { background: rgba(239,68,68,0.3); border-color: var(--red-alert); box-shadow: 0 0 10px rgba(239,68,68,0.4); animation: pulse 0.9s ease-in-out infinite; }
+
+/* Mobile notification abstract */
+.mobile-frame {
+  width: 160px; margin: 0 auto;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(200,169,110,0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  padding: 0.5rem;
+}
+.mobile-notif {
+  background: rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.4rem;
+  border-left: 2px solid;
+}
+.mobile-notif.ok { border-color: var(--green-ok); }
+.mobile-notif.warn { border-color: var(--amber-warn); }
+.mobile-notif.crit { border-color: var(--red-alert); }
+.mobile-notif-header {
+  display: flex; align-items: center; gap: 0.4rem;
+  margin-bottom: 0.3rem;
+}
+.mobile-notif-app {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.55rem;
+  font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.mobile-notif.ok .mobile-notif-app { color: var(--green-ok); }
+.mobile-notif.warn .mobile-notif-app { color: var(--amber-warn); }
+.mobile-notif.crit .mobile-notif-app { color: var(--red-alert); }
+.mobile-notif-time {
+  font-size: 0.48rem; color: rgba(255,255,255,0.25);
+  font-family: 'Barlow Condensed', sans-serif; margin-left: auto;
+}
+.mobile-notif-msg {
+  font-size: 0.55rem; color: rgba(255,255,255,0.55); line-height: 1.4;
+  font-family: 'Barlow Condensed', sans-serif;
+}
+
+/* Alert correlation abstract */
+.correlation-abstract {
+  position: relative; flex: 1; margin-bottom: 1.5rem; min-height: 160px;
+}
+.corr-node {
+  position: absolute;
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.5rem;
+  font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.corr-node.root { background: rgba(239,68,68,0.15); border: 1.5px solid var(--red-alert); color: var(--red-alert); }
+.corr-node.child { background: rgba(251,191,36,0.1); border: 1.5px solid rgba(251,191,36,0.5); color: var(--amber-warn); }
+.corr-node.sensor { background: rgba(200,169,110,0.08); border: 1px solid rgba(200,169,110,0.3); color: rgba(200,169,110,0.6); }
+.corr-line {
+  position: absolute; height: 1px; background: rgba(200,169,110,0.15); transform-origin: left center;
+}
+
+.dash-abstract-caption { }
+.dash-abstract-caption .dp-tag {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem;
+}
+.dash-abstract-caption h3 { font-size: 1.1rem; text-transform: uppercase; color: var(--white); margin-bottom: 0.4rem; }
+.dash-abstract-caption p { font-size: 0.82rem; color: rgba(255,255,255,0.35); line-height: 1.6; }
+
+/* ══════════════════════════════════
+   KEY FEATURES
+══════════════════════════════════ */
+.features-section {
+  background: var(--ink);
+  padding: 8rem 6rem;
+}
+.features-section h2 {
+  font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase;
+  color: var(--white); margin-bottom: 1rem; line-height: 1;
+}
+.features-intro { color: rgba(255,255,255,0.35); max-width: 500px; margin-bottom: 5rem; }
+
+.features-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0; border: 1px solid var(--border);
+}
+.feature-card {
+  padding: 2.5rem; border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  position: relative; overflow: hidden;
+  transition: background 0.3s; cursor: default;
+}
+.feature-card:nth-child(3n) { border-right: none; }
+.feature-card:nth-last-child(-n+3) { border-bottom: none; }
+.feature-card::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 0; height: 2px; background: var(--accent); transition: width 0.4s ease;
+}
+.feature-card:hover { background: rgba(200,169,110,0.04); }
+.feature-card:hover::before { width: 100%; }
+
+.feature-icon {
+  width: 44px; height: 44px; border: 1px solid rgba(200,169,110,0.2);
+  display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;
+  transition: background 0.3s, border-color 0.3s;
+}
+.feature-card:hover .feature-icon { background: rgba(200,169,110,0.1); border-color: var(--accent); }
+.feature-icon i { font-size: 1rem; color: var(--accent); }
+.feature-card h3 {
+  font-size: 1.05rem; text-transform: uppercase; color: var(--white);
+  margin-bottom: 0.6rem; line-height: 1.1;
+}
+.feature-card p { font-size: 0.875rem; color: rgba(255,255,255,0.35); line-height: 1.65; }
+.feature-tag {
+  display: inline-block; margin-top: 1.25rem;
+  padding: 0.25rem 0.7rem; border: 1px solid rgba(200,169,110,0.2);
+  font-size: 0.6rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(200,169,110,0.6);
+}
+
+/* ══════════════════════════════════
+   ABSTRACT DIVIDER
+══════════════════════════════════ */
+.abstract-divider {
+  background: var(--black); padding: 5rem 6rem;
+  display: flex; align-items: center; gap: 3rem; overflow: hidden; position: relative;
+}
+.abstract-divider::after {
+  content: 'ALWAYS AWARE';
+  position: absolute; right: 3rem;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 7rem; font-weight: 800;
+  color: rgba(200,169,110,0.04); text-transform: uppercase;
+  letter-spacing: -0.02em; white-space: nowrap; pointer-events: none;
+}
+.divider-line { flex: 1; height: 1px; background: linear-gradient(to right, var(--accent), transparent); }
+.divider-quote blockquote {
+  font-family: 'Barlow Condensed', sans-serif; font-size: clamp(1.5rem,2.5vw,2.5rem);
+  font-weight: 600; font-style: italic; color: var(--white); text-transform: uppercase;
+  line-height: 1.1; max-width: 520px;
+}
+.divider-quote blockquote em { color: var(--accent); font-style: normal; }
+
+/* ══════════════════════════════════
+   TECHNICAL ARCHITECTURE
+══════════════════════════════════ */
+.arch-section {
+  background: var(--charcoal);
+  padding: 8rem 6rem;
+}
+.arch-section h2 {
+  font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase;
+  color: var(--white); margin-bottom: 1rem; line-height: 1;
+}
+.arch-intro { color: rgba(255,255,255,0.35); max-width: 500px; margin-bottom: 5rem; }
+
+.arch-stack {
+  display: flex; flex-direction: column; gap: 0;
+  max-width: 780px; margin: 0 auto;
+}
+
+.arch-layer {
+  display: grid; grid-template-columns: 160px 1fr;
+  gap: 0; border: 1px solid var(--border);
+  margin-bottom: -1px; /* collapse borders */
+  position: relative;
+  transition: background 0.3s; cursor: default;
+}
+.arch-layer:hover { background: rgba(200,169,110,0.04); z-index: 2; }
+
+.arch-layer-left {
+  padding: 1.5rem 2rem;
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; justify-content: center;
+  background: rgba(200,169,110,0.03);
+}
+.arch-layer-num {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.55rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase; color: rgba(200,169,110,0.4); margin-bottom: 0.5rem;
+}
+.arch-layer-icon { font-size: 1.2rem; color: var(--accent); }
+
+.arch-layer-right {
+  padding: 1.5rem 2rem;
+  display: flex; align-items: center; gap: 2rem;
+}
+.arch-layer-right h4 {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--white);
+  min-width: 180px;
+}
+.arch-layer-right p { font-size: 0.85rem; color: rgba(255,255,255,0.35); line-height: 1.6; }
+
+/* Connector arrows between layers */
+.arch-connector {
+  display: flex; justify-content: center; align-items: center;
+  height: 28px; position: relative;
+}
+.arch-connector::before {
+  content: '';
+  width: 1px; height: 100%;
+  background: linear-gradient(to bottom, rgba(200,169,110,0.3), rgba(200,169,110,0.1));
+}
+.arch-connector-dot {
+  position: absolute;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(200,169,110,0.4);
+  border: 1px solid var(--accent);
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+}
+
+/* Protocols strip */
+.protocols-strip {
+  display: flex; gap: 0; border: 1px solid var(--border); margin-top: 4rem;
+  flex-wrap: wrap;
+}
+.protocol-item {
+  flex: 1; min-width: 120px;
+  padding: 1.25rem 2rem;
+  border-right: 1px solid var(--border);
+  text-align: center; cursor: default;
+  transition: background 0.3s;
+}
+.protocol-item:last-child { border-right: none; }
+.protocol-item:hover { background: rgba(200,169,110,0.05); }
+.protocol-name {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent); margin-bottom: 0.3rem;
+}
+.protocol-desc { font-size: 0.7rem; color: rgba(255,255,255,0.25); letter-spacing: 0.05em; }
+
+/* ══════════════════════════════════
+   USE CASES
+══════════════════════════════════ */
+.cases-section {
+  background: var(--section-light);
+  padding: 8rem 6rem;
+}
+.cases-section h2 {
+  font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase;
+  color: var(--black); margin-bottom: 1rem; line-height: 1;
+}
+.cases-intro { color: var(--muted); max-width: 500px; margin-bottom: 5rem; }
+
+.cases-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 0; border: 1px solid #d8d5ce;
+}
+.case-card {
+  padding: 3rem; border-right: 1px solid #d8d5ce; border-bottom: 1px solid #d8d5ce;
+  transition: background 0.25s; cursor: default;
+}
+.case-card:nth-child(2n) { border-right: none; }
+.case-card:nth-last-child(-n+2) { border-bottom: none; }
+.case-card:hover { background: var(--cream); }
+
+.case-industry-row {
+  display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem;
+}
+.ci-icon {
+  width: 40px; height: 40px; border: 1px solid #c8c5be;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.3s;
+}
+.case-card:hover .ci-icon { background: rgba(200,169,110,0.15); }
+.ci-icon i { font-size: 0.9rem; color: var(--accent-dark); }
+.ci-name {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent-dark);
+}
+.case-card h3 { font-size: 1.3rem; text-transform: uppercase; color: var(--black); margin-bottom: 1rem; line-height: 1.1; }
+.case-desc { font-size: 0.9rem; color: var(--muted); margin-bottom: 2rem; line-height: 1.7; }
+
+.scenario-box {
+  background: var(--black); padding: 1.5rem 1.75rem; margin-bottom: 1.5rem;
+  border-left: 3px solid var(--accent); position: relative;
+}
+.scenario-box::before {
+  content: 'SCENARIO'; position: absolute; top: -0.6rem; left: 1.5rem;
+  background: var(--black); padding: 0 0.5rem;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.6rem; font-weight: 600;
+  letter-spacing: 0.2em; color: var(--accent);
+}
+.scenario-box p { font-size: 0.85rem; color: rgba(255,255,255,0.5); font-style: italic; line-height: 1.65; }
+
+.case-result {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.7rem 0; border-top: 1px solid #e0ddd8;
+}
+.case-result i { font-size: 0.65rem; color: var(--accent-dark); flex-shrink: 0; }
+.case-result span { font-size: 0.85rem; color: var(--mid); }
+.case-result strong { font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--accent-dark); }
+
+/* ══════════════════════════════════
+   BENEFITS
+══════════════════════════════════ */
+.benefits-section {
+  background: var(--black);
+  padding: 8rem 6rem;
+}
+.benefits-section h2 {
+  font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase;
+  color: var(--white); margin-bottom: 1rem; line-height: 1;
+}
+.benefits-intro { color: rgba(255,255,255,0.35); max-width: 500px; margin-bottom: 5rem; }
+
+.benefits-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 0; border: 1px solid var(--border);
+}
+.benefit-card {
+  padding: 3rem 2.5rem; border-right: 1px solid var(--border);
+  position: relative; overflow: hidden; transition: background 0.3s; cursor: default;
+}
+.benefit-card:last-child { border-right: none; }
+.benefit-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0;
+  width: 0; height: 2px; background: var(--accent); transition: width 0.4s ease;
+}
+.benefit-card:hover { background: rgba(200,169,110,0.04); }
+.benefit-card:hover::after { width: 100%; }
+.benefit-num {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 3rem; font-weight: 800;
+  color: var(--accent); line-height: 1; margin-bottom: 0.5rem;
+}
+.benefit-card h4 {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--white); margin-bottom: 0.75rem;
+}
+.benefit-card p { font-size: 0.85rem; color: rgba(255,255,255,0.35); line-height: 1.65; }
+.benefit-bg-num {
+  position: absolute; top: 1rem; right: 1rem;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 4.5rem; font-weight: 800;
+  color: rgba(255,255,255,0.03); line-height: 1; pointer-events: none;
+}
+
+/* ══════════════════════════════════
+   MANIFESTO + CTA
+══════════════════════════════════ */
+.manifesto-strip {
+  background: var(--accent); padding: 4rem 6rem;
+  display: grid; grid-template-columns: 1fr auto; gap: 4rem; align-items: center;
+}
+.manifesto-strip h2 {
+  font-size: clamp(1.8rem,3vw,3rem); text-transform: uppercase;
+  color: var(--black); max-width: 750px;
+}
+.manifesto-strip h2 em { font-style: normal; text-decoration: underline; text-underline-offset: 6px; }
+
+.cta-section {
+  background: var(--charcoal); padding: 7rem 6rem;
+  display: grid; grid-template-columns: 1fr auto; gap: 4rem; align-items: center;
+}
+.cta-section h2 {
+  font-size: clamp(2rem,3.5vw,3.5rem); color: var(--white); text-transform: uppercase; max-width: 650px;
+}
+.cta-section h2 em { font-style: italic; font-weight: 300; color: var(--accent); }
+.cta-actions { display: flex; flex-direction: column; gap: 1rem; min-width: 200px; }
+.btn-whatsapp {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+  padding: 1rem 2rem; background: #25D366; color: var(--white);
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; transition: background 0.2s;
+}
+.btn-whatsapp:hover { background: #1ab555; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1100px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-left { padding: 5rem 3rem 3rem; }
+  .hero-right { padding: 3rem 3rem 5rem; }
+  .dashboard-section, .features-section, .arch-section,
+  .cases-section, .benefits-section { padding: 6rem 3rem; }
+  .manifesto-strip, .cta-section { padding: 5rem 3rem; }
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+  .feature-card:nth-child(3n) { border-right: 1px solid var(--border); }
+  .feature-card:nth-child(2n) { border-right: none; }
+  .benefits-grid { grid-template-columns: repeat(2, 1fr); }
+  .benefit-card:nth-child(2n) { border-right: none; }
+  .benefit-card:nth-child(1), .benefit-card:nth-child(2) { border-bottom: 1px solid var(--border); }
+  .arch-layer { grid-template-columns: 120px 1fr; }
+}
+@media (max-width: 900px) {
+  nav { padding: 0 1.5rem; }
+  .hero-left { padding: 4rem 2rem 2rem; }
+  .hero-right { display: none; }
+  .split-header { grid-template-columns: 1fr; gap: 1.5rem; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .cases-grid { grid-template-columns: 1fr; }
+  .case-card { border-right: none; }
+  .case-card:nth-last-child(-n+2) { border-bottom: 1px solid #d8d5ce; }
+  .case-card:last-child { border-bottom: none; }
+  .manifesto-strip, .cta-section { grid-template-columns: 1fr; gap: 2rem; }
+  .arch-layer { grid-template-columns: 1fr; }
+  .arch-layer-left { border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; gap: 1rem; }
+  .dashboard-section, .features-section, .arch-section,
+  .cases-section, .benefits-section { padding: 5rem 2rem; }
+  .manifesto-strip, .cta-section { padding: 4rem 2rem; }
+}
+@media (max-width: 600px) {
+  .hero-left { padding: 4rem 1.5rem 3rem; }
+  .hero-actions { flex-direction: column; }
+  .benefits-grid { grid-template-columns: 1fr; }
+  .benefit-card { border-right: none; border-bottom: 1px solid var(--border); }
+  .benefit-card:last-child { border-bottom: none; }
+  .features-grid { grid-template-columns: 1fr; }
+  .feature-card:nth-child(3n), .feature-card:nth-child(2n) { border-right: none; }
+  .feature-card:nth-last-child(-n+3) { border-bottom: 1px solid var(--border); }
+  .feature-card:last-child { border-bottom: none; }
+  .abstract-divider, .dashboard-section, .features-section, .arch-section,
+  .cases-section, .benefits-section { padding: 4rem 1.5rem; }
+  .manifesto-strip, .cta-section { padding: 3rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <span class="nav-logo-text">Zero Eleven</span>
+  </a>
+  <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Home</a>
+  <a href="https://api.whatsapp.com/send?phone=6281243953947" target="_blank" class="nav-cta-btn">
+    <i class="fab fa-whatsapp"></i> Talk to Us
+  </a>
+</nav>
+
+<!-- ══════════════════════════════════
+     HERO
+══════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-breadcrumb">
+      <span class="bc-parent">Capabilities</span>
+      <span class="bc-sep">/</span>
+      <span class="bc-current">04</span>
+    </div>
+
+    <div class="capability-badge">
+      <div class="badge-dot"></div>
+      <span>Real-Time Monitoring & Alerting</span>
+    </div>
+
+    <h1>
+      Always Aware,<br>
+      <em>Always</em><br>
+      Responsive
+    </h1>
+
+    <p class="hero-subhead">"Continuous operational surveillance with instant anomaly detection."</p>
+
+    <div class="hero-metrics">
+      <div class="hero-metric">
+        <div class="hm-num">95%</div>
+        <div class="hm-label">False Alert Reduction</div>
+      </div>
+      <div class="hero-metric">
+        <div class="hm-num">60%</div>
+        <div class="hm-label">Faster Incident Response</div>
+      </div>
+      <div class="hero-metric">
+        <div class="hm-num">100%</div>
+        <div class="hm-label">Asset Visibility</div>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a href="#dashboard" class="btn-primary">See the Platform <i class="fas fa-arrow-down"></i></a>
+      <a href="#cases" class="btn-ghost">Use Cases</a>
+    </div>
+  </div>
+
+  <!-- Hero Right: Abstract live monitoring dashboard -->
+  <div class="hero-right">
+    <div class="live-dashboard">
+      <div class="ld-topbar">
+        <span class="ld-title"><i class="fas fa-broadcast-tower" style="margin-right:0.4rem;font-size:0.6rem"></i>Operations Command Center</span>
+        <span class="ld-live"><div class="ld-live-dot"></div>Live · 15:33:08</span>
+      </div>
+
+      <div class="ld-kpis">
+        <div class="ld-kpi">
+          <div class="ld-kpi-val green">98.4%</div>
+          <div class="ld-kpi-label">Availability</div>
+        </div>
+        <div class="ld-kpi">
+          <div class="ld-kpi-val amber">2</div>
+          <div class="ld-kpi-label">Warnings</div>
+        </div>
+        <div class="ld-kpi">
+          <div class="ld-kpi-val blue">240</div>
+          <div class="ld-kpi-label">Data Points</div>
+        </div>
+        <div class="ld-kpi">
+          <div class="ld-kpi-val gold">36.0</div>
+          <div class="ld-kpi-label">Avg Pressure</div>
+        </div>
+      </div>
+
+      <!-- Sparkline chart -->
+      <div class="ld-chart-area">
+        <div class="ld-chart-label">Left Pressure & Right Pressure · Auto-refresh 2s</div>
+        <div class="ld-chart">
+          <svg viewBox="0 0 420 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="0" y1="20" x2="420" y2="20" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="0" y1="40" x2="420" y2="40" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="0" y1="60" x2="420" y2="60" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <!-- Left pressure — cyan -->
+            <polyline
+              points="0,45 15,35 25,30 40,45 55,50 60,28 75,42 90,45 100,38 115,44 130,47 140,30 155,43 170,46 180,35 195,44 210,48 225,32 240,44 255,46 265,25 280,43 295,47 310,35 325,43 340,46 355,30 370,44 385,47 400,29 420,43"
+              stroke="#22d3ee" stroke-width="1.5" fill="none"/>
+            <!-- Right pressure — blue -->
+            <polyline
+              points="0,47 15,37 25,32 40,47 55,52 60,30 75,44 90,47 100,40 115,46 130,49 140,32 155,45 170,48 180,37 195,46 210,50 225,34 240,46 255,48 265,27 280,45 295,49 310,37 325,45 340,48 355,32 370,46 385,49 400,31 420,45"
+              stroke="#60a5fa" stroke-width="1.5" fill="none" opacity="0.7"/>
+            <!-- Warning threshold -->
+            <line x1="0" y1="18" x2="420" y2="18" stroke="rgba(251,191,36,0.3)" stroke-width="1" stroke-dasharray="4,3"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Alert stream -->
+      <div class="ld-alerts">
+        <div class="ld-alert-item">
+          <div class="ld-alert-dot crit"></div>
+          <div class="ld-alert-text crit">Line 7 · Pressure spike detected — 68.2 kg</div>
+          <div class="ld-alert-time">15:33:01</div>
+        </div>
+        <div class="ld-alert-item">
+          <div class="ld-alert-dot warn"></div>
+          <div class="ld-alert-text warn">Pump A3 · Vibration trending +12% above baseline</div>
+          <div class="ld-alert-time">15:32:44</div>
+        </div>
+        <div class="ld-alert-item">
+          <div class="ld-alert-dot ok"></div>
+          <div class="ld-alert-text ok">Conveyor B · Back within normal operating range</div>
+          <div class="ld-alert-time">15:32:20</div>
+        </div>
+        <div class="ld-alert-item">
+          <div class="ld-alert-dot ok"></div>
+          <div class="ld-alert-text ok">All 14 sensors nominal · Data acquisition healthy</div>
+          <div class="ld-alert-time">15:31:58</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     DASHBOARD SHOWCASE
+══════════════════════════════════ -->
+<section class="dashboard-section reveal" id="dashboard">
+  <div class="split-header">
+    <div>
+      <span class="label" style="color:var(--accent-dark);display:block;margin-bottom:0.75rem">The Platform</span>
+      <h2>One View for<br>Every Operation</h2>
+    </div>
+    <p>From machine-level sensor data to plant-wide situational awareness — a unified monitoring layer that surfaces the right information, to the right person, at the right moment.</p>
+  </div>
+
+  <div class="dashboard-grid">
+
+    <!-- Panel 1: Real-time trend dashboard (screenshot) -->
+    <div class="dash-panel reveal">
+      <img src="sources/realtime-monitoring.jpeg" alt="Real-time machine monitoring dashboard — live pressure trend, KPI indicators, connected status" class="dash-panel-image">
+      <div class="dash-panel-caption">
+        <div class="dp-tag">01 · Live Operational View</div>
+        <h3>Real-Time Machine Trend Monitoring</h3>
+        <p>Per-machine dashboards display live sensor readings, rolling trend charts, and KPI indicators — auto-refreshed every 2 seconds. Factory, building, line, and machine selection give operators instant drill-down to any asset in the plant.</p>
+      </div>
+    </div>
+
+    <!-- Panel 2: SCADA process view (screenshot) -->
+    <div class="dash-panel reveal" style="transition-delay:0.1s">
+      <img src="sources/scada.jpg" alt="SCADA process visualization — full plant flow diagram with live sensor values at every node" class="dash-panel-image">
+      <div class="dash-panel-caption">
+        <div class="dp-tag">02 · Process Intelligence</div>
+        <h3>SCADA Process Flow Visualization</h3>
+        <p>Full plant process diagrams with live sensor values overlaid at every node. Operators see the entire process topology — valves, temperatures, flows, pressures — and can identify deviations in context, not in isolation.</p>
+      </div>
+    </div>
+
+    <!-- Panel 3: Alert Correlation (abstract) -->
+    <div class="dash-panel-abstract reveal" style="transition-delay:0.2s">
+      <div style="position:relative;flex:1;margin-bottom:1.5rem;min-height:170px;">
+        <!-- correlation lines (SVG) -->
+        <svg width="100%" height="100%" viewBox="0 0 340 170" style="position:absolute;inset:0">
+          <line x1="170" y1="85" x2="80" y2="40" stroke="rgba(239,68,68,0.25)" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <line x1="170" y1="85" x2="260" y2="40" stroke="rgba(239,68,68,0.25)" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <line x1="170" y1="85" x2="50" y2="130" stroke="rgba(251,191,36,0.2)" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="170" y1="85" x2="290" y2="130" stroke="rgba(251,191,36,0.2)" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="80" y1="40" x2="30" y2="15" stroke="rgba(200,169,110,0.15)" stroke-width="1"/>
+          <line x1="80" y1="40" x2="130" y2="10" stroke="rgba(200,169,110,0.15)" stroke-width="1"/>
+          <line x1="260" y1="40" x2="210" y2="10" stroke="rgba(200,169,110,0.15)" stroke-width="1"/>
+          <line x1="260" y1="40" x2="310" y2="15" stroke="rgba(200,169,110,0.15)" stroke-width="1"/>
+        </svg>
+        <!-- Root cause node -->
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:rgba(239,68,68,0.15);border:1.5px solid rgba(239,68,68,0.7);display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px rgba(239,68,68,0.2)">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.48rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:rgba(239,68,68,0.9);text-align:center;line-height:1.2">ROOT<br>CAUSE</span>
+        </div>
+        <!-- Child alert nodes -->
+        <div style="position:absolute;top:10%;left:17%;width:36px;height:36px;border-radius:50%;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.4);display:flex;align-items:center;justify-content:center">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.45rem;font-weight:700;color:rgba(239,68,68,0.7);text-align:center;line-height:1.1">TEMP<br>HIGH</span>
+        </div>
+        <div style="position:absolute;top:10%;right:15%;width:36px;height:36px;border-radius:50%;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.4);display:flex;align-items:center;justify-content:center">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.45rem;font-weight:700;color:rgba(239,68,68,0.7);text-align:center;line-height:1.1">PRESS<br>SPIKE</span>
+        </div>
+        <div style="position:absolute;bottom:5%;left:10%;width:30px;height:30px;border-radius:50%;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.35);display:flex;align-items:center;justify-content:center">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.42rem;font-weight:700;color:rgba(251,191,36,0.65);text-align:center;line-height:1.1">VIB</span>
+        </div>
+        <div style="position:absolute;bottom:5%;right:12%;width:30px;height:30px;border-radius:50%;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.35);display:flex;align-items:center;justify-content:center">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.42rem;font-weight:700;color:rgba(251,191,36,0.65);text-align:center;line-height:1.1">FLOW</span>
+        </div>
+        <!-- Sensor nodes -->
+        <div style="position:absolute;top:0%;left:3%;width:22px;height:22px;border-radius:50%;background:rgba(200,169,110,0.05);border:1px solid rgba(200,169,110,0.2);display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-circle" style="font-size:0.3rem;color:rgba(200,169,110,0.4)"></i>
+        </div>
+        <div style="position:absolute;top:-2%;left:32%;width:22px;height:22px;border-radius:50%;background:rgba(200,169,110,0.05);border:1px solid rgba(200,169,110,0.2);display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-circle" style="font-size:0.3rem;color:rgba(200,169,110,0.4)"></i>
+        </div>
+        <div style="position:absolute;top:-2%;right:30%;width:22px;height:22px;border-radius:50%;background:rgba(200,169,110,0.05);border:1px solid rgba(200,169,110,0.2)"></div>
+        <div style="position:absolute;top:0%;right:5%;width:22px;height:22px;border-radius:50%;background:rgba(200,169,110,0.05);border:1px solid rgba(200,169,110,0.2)"></div>
+      </div>
+      <div class="dash-abstract-caption">
+        <div class="dp-tag">03 · Alert Intelligence</div>
+        <h3>Alert Correlation Engine</h3>
+        <p>Multiple simultaneous alerts are automatically clustered to their root cause — eliminating alert storms and giving operators a single, actionable event instead of 12 disconnected notifications.</p>
+      </div>
+    </div>
+
+    <!-- Panel 4: Mobile Notifications (abstract) -->
+    <div class="dash-panel-abstract reveal" style="transition-delay:0.3s">
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem">
+        <div class="mobile-frame">
+          <div style="padding:0.5rem 0.5rem 0.3rem;text-align:center">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.5rem;color:rgba(255,255,255,0.2);letter-spacing:0.1em;margin-bottom:0.5rem">NOTIFICATIONS · NOW</div>
+          </div>
+          <div class="mobile-notif crit">
+            <div class="mobile-notif-header">
+              <span class="mobile-notif-app">⚠ Zero Eleven</span>
+              <span class="mobile-notif-time">just now</span>
+            </div>
+            <div class="mobile-notif-msg">CRITICAL: Line 7 pressure spike 68.2kg. Immediate inspection required.</div>
+          </div>
+          <div class="mobile-notif warn">
+            <div class="mobile-notif-header">
+              <span class="mobile-notif-app">⚡ Zero Eleven</span>
+              <span class="mobile-notif-time">2m ago</span>
+            </div>
+            <div class="mobile-notif-msg">WARNING: Pump A3 vibration +12% above 7-day baseline.</div>
+          </div>
+          <div class="mobile-notif ok">
+            <div class="mobile-notif-header">
+              <span class="mobile-notif-app">✓ Zero Eleven</span>
+              <span class="mobile-notif-time">14m ago</span>
+            </div>
+            <div class="mobile-notif-msg">Conveyor B restored to normal. RCA logged automatically.</div>
+          </div>
+          <div style="padding:0.5rem;text-align:center">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.48rem;color:rgba(255,255,255,0.15);letter-spacing:0.1em">iOS · Android · Web</span>
+          </div>
+        </div>
+      </div>
+      <div class="dash-abstract-caption">
+        <div class="dp-tag">04 · Mobile Intelligence</div>
+        <h3>Instant Mobile Notification</h3>
+        <p>Context-aware push notifications delivered to any device — with severity grade, affected asset, and recommended action pre-populated. The right person is informed before they even reach their desk.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     KEY FEATURES
+══════════════════════════════════ -->
+<section class="features-section reveal" id="features">
+  <span class="label" style="display:block;margin-bottom:1rem">Platform Capabilities</span>
+  <h2>Built for<br>Operational Reality</h2>
+  <p class="features-intro">Six capabilities that separate operational intelligence from basic monitoring — designed for the complexity of industrial environments.</p>
+
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-icon"><i class="fas fa-plug"></i></div>
+      <h3>Multi-Protocol<br>Support</h3>
+      <p>Native connectivity to OPC-UA, Modbus TCP/RTU, MQTT, PROFINET, EtherNet/IP, and REST APIs. Any sensor, any PLC, any SCADA system — integrated without custom middleware.</p>
+      <span class="feature-tag">OPC-UA · Modbus · MQTT · REST</span>
+    </div>
+    <div class="feature-card reveal" style="transition-delay:0.05s">
+      <div class="feature-icon"><i class="fas fa-brain"></i></div>
+      <h3>Smart Context-Aware<br>Alerting</h3>
+      <p>Alerts are generated against learned operational context — not static thresholds. The system suppresses alerts during known state changes (startups, shutdowns, mode switches), reducing false positives by 95%.</p>
+      <span class="feature-tag">95% False Positive Reduction</span>
+    </div>
+    <div class="feature-card reveal" style="transition-delay:0.1s">
+      <div class="feature-icon"><i class="fas fa-search"></i></div>
+      <h3>Automatic Root Cause<br>Analysis</h3>
+      <p>Every confirmed incident triggers an automated RCA workflow — correlating contributing sensor signals, identifying the probable root cause, and logging the causal chain for engineering review.</p>
+      <span class="feature-tag">Auto-RCA · Causal Chain Logging</span>
+    </div>
+    <div class="feature-card reveal" style="transition-delay:0.15s">
+      <div class="feature-icon"><i class="fas fa-clock"></i></div>
+      <h3>Predictive Alert<br>Generation</h3>
+      <p>By integrating with the Predictive Operations layer, alerts are issued before anomalies breach thresholds — based on trajectory and pattern, not current state. Response replaces reaction.</p>
+      <span class="feature-tag">Pre-Threshold Early Warning</span>
+    </div>
+    <div class="feature-card reveal" style="transition-delay:0.2s">
+      <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+      <h3>Mobile-First<br>Notification</h3>
+      <p>Real-time push notifications to iOS and Android with severity, asset ID, recommended action, and one-tap escalation. On-call engineers are informed within seconds of any incident — anywhere in the world.</p>
+      <span class="feature-tag">iOS · Android · Web · SMS</span>
+    </div>
+    <div class="feature-card reveal" style="transition-delay:0.25s">
+      <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+      <h3>Historical Analytics<br>& Trend Recognition</h3>
+      <p>Long-term trend visualization across all sensor streams — with anomaly annotation, maintenance event overlay, and pattern recognition to identify recurring failure modes and systemic degradation.</p>
+      <span class="feature-tag">Pattern Recognition · Long-Term Trends</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     ABSTRACT DIVIDER
+══════════════════════════════════ -->
+<div class="abstract-divider">
+  <div class="divider-line"></div>
+  <div class="divider-quote">
+    <blockquote>
+      "An alarm that arrives<br>
+      after the damage is<br>
+      not an alarm. It's a <em>report</em>."
+    </blockquote>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     TECHNICAL ARCHITECTURE
+══════════════════════════════════ -->
+<section class="arch-section reveal" id="architecture">
+  <span class="label" style="display:block;margin-bottom:1rem">System Architecture</span>
+  <h2>From Edge<br>to Insight</h2>
+  <p class="arch-intro">A six-layer data pipeline — from sensor to screen — engineered for industrial reliability, latency, and scale.</p>
+
+  <div class="arch-stack">
+    <div class="arch-layer reveal">
+      <div class="arch-layer-left">
+        <div class="arch-layer-num">Layer 01</div>
+        <div class="arch-layer-icon"><i class="fas fa-broadcast-tower"></i></div>
+      </div>
+      <div class="arch-layer-right">
+        <h4>Edge Data Collectors</h4>
+        <p>Industrial IoT gateways installed at the machine level. Collect raw sensor data via OPC-UA, Modbus, MQTT at configurable intervals (1ms–60s). Pre-process and timestamp locally — zero data loss even during network disruption.</p>
+      </div>
+    </div>
+
+    <div class="arch-connector"><div class="arch-connector-dot"></div></div>
+
+    <div class="arch-layer reveal" style="transition-delay:0.08s">
+      <div class="arch-layer-left">
+        <div class="arch-layer-num">Layer 02</div>
+        <div class="arch-layer-icon"><i class="fas fa-database"></i></div>
+      </div>
+      <div class="arch-layer-right">
+        <h4>Time-Series Database</h4>
+        <p>High-performance time-series storage optimized for industrial sensor data ingestion rates. Retains full-resolution historical data for trend analysis, model training, and regulatory compliance — with automated compression for long-term archives.</p>
+      </div>
+    </div>
+
+    <div class="arch-connector"><div class="arch-connector-dot"></div></div>
+
+    <div class="arch-layer reveal" style="transition-delay:0.16s">
+      <div class="arch-layer-left">
+        <div class="arch-layer-num">Layer 03</div>
+        <div class="arch-layer-icon"><i class="fas fa-water"></i></div>
+      </div>
+      <div class="arch-layer-right">
+        <h4>Stream Processing Engine</h4>
+        <p>Real-time computation on live data streams — running anomaly detection models, threshold evaluation, rate-of-change calculations, and multi-sensor correlation in sub-second latency. Handles millions of data points per second.</p>
+      </div>
+    </div>
+
+    <div class="arch-connector"><div class="arch-connector-dot"></div></div>
+
+    <div class="arch-layer reveal" style="transition-delay:0.24s">
+      <div class="arch-layer-left">
+        <div class="arch-layer-num">Layer 04</div>
+        <div class="arch-layer-icon"><i class="fas fa-project-diagram"></i></div>
+      </div>
+      <div class="arch-layer-right">
+        <h4>Alert Correlation Engine</h4>
+        <p>Intelligent alert clustering and deduplication — grouping simultaneous alerts to their probable root cause. Suppresses alarm storms, escalates by severity, and routes each event to the correct responder with full context attached.</p>
+      </div>
+    </div>
+
+    <div class="arch-connector"><div class="arch-connector-dot"></div></div>
+
+    <div class="arch-layer reveal" style="transition-delay:0.32s">
+      <div class="arch-layer-left">
+        <div class="arch-layer-num">Layer 05</div>
+        <div class="arch-layer-icon"><i class="fas fa-paper-plane"></i></div>
+      </div>
+      <div class="arch-layer-right">
+        <h4>Notification Service</h4>
+        <p>Multi-channel delivery — push notification (iOS/Android), in-app dashboard, SMS, email, and webhook integration to CMMS, ERP, or ticketing systems. Escalation logic ensures no alert goes unacknowledged.</p>
+      </div>
+    </div>
+
+    <div class="arch-connector"><div class="arch-connector-dot"></div></div>
+
+    <div class="arch-layer reveal" style="transition-delay:0.4s">
+      <div class="arch-layer-left">
+        <div class="arch-layer-num">Layer 06</div>
+        <div class="arch-layer-icon"><i class="fas fa-chart-area"></i></div>
+      </div>
+      <div class="arch-layer-right">
+        <h4>Analytics & Reporting Layer</h4>
+        <p>Long-term trend dashboards, OEE reports, downtime analysis, energy consumption tracking, and audit logs — accessible via web browser or mobile app. Exportable to PDF, Excel, or data warehouse for management reporting.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Protocols -->
+  <div class="protocols-strip reveal" style="transition-delay:0.1s">
+    <div class="protocol-item">
+      <div class="protocol-name">OPC-UA</div>
+      <div class="protocol-desc">Industrial standard</div>
+    </div>
+    <div class="protocol-item">
+      <div class="protocol-name">Modbus</div>
+      <div class="protocol-desc">TCP / RTU</div>
+    </div>
+    <div class="protocol-item">
+      <div class="protocol-name">MQTT</div>
+      <div class="protocol-desc">IoT messaging</div>
+    </div>
+    <div class="protocol-item">
+      <div class="protocol-name">PROFINET</div>
+      <div class="protocol-desc">Industrial ethernet</div>
+    </div>
+    <div class="protocol-item">
+      <div class="protocol-name">REST API</div>
+      <div class="protocol-desc">Web integration</div>
+    </div>
+    <div class="protocol-item">
+      <div class="protocol-name">SCADA</div>
+      <div class="protocol-desc">DCS / PLC bridging</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     USE CASES
+══════════════════════════════════ -->
+<section class="cases-section reveal" id="cases">
+  <span class="label" style="color:var(--accent-dark);display:block;margin-bottom:1rem">Industry Applications</span>
+  <h2>Eyes on Every<br>Operation</h2>
+  <p class="cases-intro">Four sectors where continuous monitoring changes the outcome — from plant floor to power grid to underground mine.</p>
+
+  <div class="cases-grid">
+
+    <!-- Manufacturing OEE -->
+    <div class="case-card reveal">
+      <div class="case-industry-row">
+        <div class="ci-icon"><i class="fas fa-industry"></i></div>
+        <span class="ci-name">Manufacturing</span>
+      </div>
+      <h3>Real-Time OEE<br>Monitoring</h3>
+      <p class="case-desc">Overall Equipment Effectiveness is the single most important KPI in manufacturing — but most plants see it only in yesterday's report. Real-time OEE monitoring changes the economics of every shift.</p>
+      <div class="scenario-box">
+        <p>Line 3 availability drops from 94% to 87% at 10:15 on a Tuesday. The monitoring system identifies a micro-stoppage pattern on Machine 7 — 14 stops under 2 minutes each, invisible in daily OEE reports. The stream processing engine flags it within 4 minutes. The team resolves a feeder jam before it escalates to a line stop.</p>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>OEE visibility shifted from <strong>24-hour lag</strong> to real-time</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-clock"></i>
+        <span><strong>60%</strong> faster incident response across production lines</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-chart-line"></i>
+        <span>Micro-stoppage events reduced <strong>72%</strong> within 90 days</span>
+      </div>
+    </div>
+
+    <!-- Energy Grid -->
+    <div class="case-card reveal" style="transition-delay:0.1s">
+      <div class="case-industry-row">
+        <div class="ci-icon"><i class="fas fa-bolt"></i></div>
+        <span class="ci-name">Energy & Utilities</span>
+      </div>
+      <h3>Grid Stability<br>Monitoring</h3>
+      <p class="case-desc">Power grids operate at tolerances that leave no room for delayed awareness. Frequency deviations, voltage instability, and transformer thermal events require seconds-level response — not minutes.</p>
+      <div class="scenario-box">
+        <p>A transformer's thermal model detects a 3.2°C above-expected temperature rise during a demand surge. The alert correlation engine links it to three upstream load events — issuing a pre-failure warning 6 minutes before the thermal limit would be breached. Load rerouting is triggered automatically.</p>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-shield-alt"></i>
+        <span>Grid thermal events detected <strong>avg. 6 min early</strong></span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-leaf"></i>
+        <span><strong>40%</strong> energy savings through consumption optimization alerts</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-check-circle"></i>
+        <span>Zero SLA breaches in monitored grid segments — <strong>12 months</strong></span>
+      </div>
+    </div>
+
+    <!-- Mining Safety -->
+    <div class="case-card reveal" style="transition-delay:0.2s">
+      <div class="case-industry-row">
+        <div class="ci-icon"><i class="fas fa-hard-hat"></i></div>
+        <span class="ci-name">Mining</span>
+      </div>
+      <h3>Underground Safety<br>Monitoring</h3>
+      <p class="case-desc">Mining environments demand safety-critical monitoring across gas levels, atmospheric conditions, structural integrity, and personnel location — with zero tolerance for response latency.</p>
+      <div class="scenario-box">
+        <p>CO₂ levels in Level 4 begin a gradual 15-minute climb, still well below any DCS static alarm threshold. The stream processing engine detects the rate-of-change anomaly and correlates it with reduced airflow on Fan Circuit B. A warning is issued 22 minutes before any threshold breach — ventilation is restored before personnel are at risk.</p>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-lungs"></i>
+        <span>Gas level anomalies detected via <strong>rate-of-change</strong> — not threshold breach</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-users"></i>
+        <span>Personnel evacuation protocol triggered <strong>22 minutes</strong> earlier</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-award"></i>
+        <span>Full regulatory safety monitoring compliance — <strong>zero incidents</strong></span>
+      </div>
+    </div>
+
+    <!-- Smart Buildings -->
+    <div class="case-card reveal" style="transition-delay:0.3s">
+      <div class="case-industry-row">
+        <div class="ci-icon"><i class="fas fa-building"></i></div>
+        <span class="ci-name">Smart Buildings</span>
+      </div>
+      <h3>HVAC & Energy<br>Optimization Monitoring</h3>
+      <p class="case-desc">Commercial and industrial buildings waste 20–30% of energy consumption through undetected HVAC inefficiencies, lighting waste, and unoccupied zone conditioning. Monitoring turns waste into savings.</p>
+      <div class="scenario-box">
+        <p>The monitoring system detects that HVAC Zone C is conditioning to setpoint 22°C while occupancy sensors show zero personnel in the zone for 3.5 hours. The energy optimization alert triggers an automatic setback to 26°C — immediately. Compressor runtime drops 34% for the zone within the hour.</p>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-thermometer-half"></i>
+        <span>Unoccupied zone conditioning detected and <strong>auto-corrected</strong></span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-dollar-sign"></i>
+        <span><strong>40%</strong> energy cost reduction through real-time optimization</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-leaf"></i>
+        <span>Carbon footprint reduced — ESG reporting data generated <strong>automatically</strong></span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     BENEFITS
+══════════════════════════════════ -->
+<section class="benefits-section reveal" id="benefits">
+  <span class="label" style="display:block;margin-bottom:1rem">Measured Outcomes</span>
+  <h2>What Changes<br>When You're Always Aware</h2>
+  <p class="benefits-intro">Four outcomes that define what operational intelligence delivers — measured across deployments, not projections.</p>
+
+  <div class="benefits-grid">
+    <div class="benefit-card">
+      <div class="benefit-bg-num">01</div>
+      <div class="benefit-num">95%</div>
+      <h4>False Alert Reduction</h4>
+      <p>Context-aware alerting eliminates the noise that desensitizes operations teams. Every alert that reaches a person is actionable — not a condition they've learned to ignore.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-bg-num">02</div>
+      <div class="benefit-num">60%</div>
+      <h4>Faster Incident Response</h4>
+      <p>From event occurrence to the right person being informed — 60% faster than manual monitoring processes. Automated RCA means response starts with a solution, not a diagnosis.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-bg-num">03</div>
+      <div class="benefit-num">40%</div>
+      <h4>Energy Savings</h4>
+      <p>Real-time consumption monitoring surfaces inefficiencies invisible to periodic audits. Automated setpoint adjustments and waste detection translate directly to utility cost reduction.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-bg-num">04</div>
+      <div class="benefit-num">100%</div>
+      <h4>Operational Visibility</h4>
+      <p>Every asset, every sensor, every process variable — visible in a single unified interface. No blind spots. No monitoring gaps. No discovering problems through production quality reports.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     MANIFESTO STRIP
+══════════════════════════════════ -->
+<div class="manifesto-strip">
+  <h2>
+    You cannot respond to what you cannot <em>see</em>.<br>
+    And you cannot optimize what you do not <em>measure</em>.<br>
+    Real-time monitoring is where <em>intelligence begins</em>.
+  </h2>
+  <a href="https://api.whatsapp.com/send?phone=6281243953947" target="_blank" class="btn-primary" style="background:var(--black);color:var(--white);white-space:nowrap">
+    Deploy Monitoring AI <i class="fas fa-arrow-right"></i>
+  </a>
+</div>
+
+<!-- ══════════════════════════════════
+     CTA
+══════════════════════════════════ -->
+<div class="cta-section" id="contact">
+  <h2>Ready to Have<br><em>Total Visibility</em><br>Across Your Operations?</h2>
+  <div class="cta-actions">
+    <a href="https://api.whatsapp.com/send?phone=6281243953947" target="_blank" class="btn-whatsapp">
+      <i class="fab fa-whatsapp"></i> Start a Conversation
+    </a>
+    <a href="index.html#process" class="btn-ghost" style="border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);justify-content:center">
+      See Our Process
+    </a>
+  </div>
+</div>
+
+<script>
+// Scroll Reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+
+// Live alert stream animation
+const alerts = [
+  { cls: 'crit', text: 'Line 7 · Pressure spike detected — 68.2 kg', time: 'just now' },
+  { cls: 'warn', text: 'Pump A3 · Vibration trending +12% above baseline', time: '2m ago' },
+  { cls: 'ok',   text: 'Conveyor B · Back within normal operating range', time: '4m ago' },
+  { cls: 'ok',   text: 'All 14 sensors nominal · Data acquisition healthy', time: '6m ago' },
+  { cls: 'warn', text: 'Fan Circuit B · Airflow drop detected — Level 4', time: '8m ago' },
+  { cls: 'crit', text: 'Transformer T3 · Thermal residual +3.2°C above model', time: '11m ago' },
+];
+let alertIdx = 0;
+const alertContainer = document.querySelector('.ld-alerts');
+if (alertContainer) {
+  setInterval(() => {
+    alertIdx = (alertIdx + 1) % alerts.length;
+    const a = alerts[alertIdx];
+    const items = alertContainer.querySelectorAll('.ld-alert-item');
+    if (items.length > 0) {
+      items[items.length - 1].remove();
+    }
+    const newItem = document.createElement('div');
+    newItem.className = 'ld-alert-item';
+    newItem.innerHTML = `
+      <div class="ld-alert-dot ${a.cls}"></div>
+      <div class="ld-alert-text ${a.cls}">${a.text}</div>
+      <div class="ld-alert-time">${a.time}</div>
+    `;
+    alertContainer.insertBefore(newItem, alertContainer.firstChild);
+  }, 3000);
+}
+</script>
+</body>
+</html>

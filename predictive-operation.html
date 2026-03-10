@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Predictive Operations Platform — Zero Eleven</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=Barlow+Condensed:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black: #0a0a0a;
+  --charcoal: #141414;
+  --ink: #1e1e1e;
+  --steel: #2a2a2a;
+  --mid: #555;
+  --muted: #888;
+  --border: rgba(255,255,255,0.08);
+  --white: #ffffff;
+  --off-white: #f4f4f2;
+  --cream: #ede9e1;
+  --accent: #c8a96e;
+  --accent-dark: #a8893e;
+  --accent-light: #e8c98e;
+  --section-light: #f7f5f0;
+  --teal: #1a7a6e;
+  --teal-light: rgba(26,122,110,0.12);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--white);
+  color: var(--black);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+h1, h2, h3 { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; line-height: 1.05; }
+p { font-weight: 300; line-height: 1.7; color: var(--mid); }
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  padding: 0 3rem; height: 72px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(10,10,10,0.96);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { display: flex; align-items: center; gap: 1rem; text-decoration: none; }
+.nav-logo-text {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 1.4rem; font-weight: 700;
+  letter-spacing: 0.05em; color: var(--white); text-transform: uppercase;
+}
+.nav-back {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-size: 0.75rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.5); text-decoration: none; transition: color 0.2s;
+}
+.nav-back:hover { color: var(--accent); }
+.nav-cta-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1.4rem; background: var(--accent); color: var(--black);
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; transition: background 0.2s;
+}
+.nav-cta-btn:hover { background: var(--accent-light); }
+
+/* ─── HERO ─── */
+.hero {
+  padding-top: 72px;
+  min-height: 100vh;
+  background: var(--black);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated waveform background */
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 59px,
+    rgba(200,169,110,0.03) 60px
+  );
+  pointer-events: none;
+}
+
+/* Glowing orb */
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 20%; right: 5%;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(200,169,110,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-left {
+  position: relative; z-index: 2;
+  padding: 5rem 4rem 5rem 6rem;
+  display: flex; flex-direction: column; justify-content: center;
+}
+
+.hero-breadcrumb {
+  display: flex; align-items: center; gap: 0.75rem; margin-bottom: 3rem;
+}
+.hero-breadcrumb span {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem;
+  font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+}
+.bc-parent { color: rgba(255,255,255,0.3); }
+.bc-sep { color: rgba(255,255,255,0.15); }
+.bc-current { color: var(--accent); }
+
+.capability-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.4rem 1rem; border: 1px solid rgba(200,169,110,0.3);
+  margin-bottom: 2rem; width: fit-content;
+}
+.badge-dot {
+  width: 6px; height: 6px; background: var(--accent); border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+.capability-badge span {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem;
+  font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent);
+}
+
+.hero h1 {
+  font-size: clamp(3rem, 5vw, 5.5rem); color: var(--white);
+  text-transform: uppercase; margin-bottom: 1rem; line-height: 0.95;
+}
+.hero h1 em { display: block; font-style: italic; font-weight: 300; color: var(--accent); }
+
+.hero-subhead {
+  font-size: 1.1rem; font-weight: 300; color: rgba(255,255,255,0.5);
+  max-width: 440px; margin-bottom: 3rem; line-height: 1.65; font-style: italic;
+}
+
+.hero-metrics {
+  display: flex; gap: 2.5rem; margin-bottom: 3rem;
+  padding-top: 2rem; border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.hero-metric .hm-num {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 2.2rem;
+  font-weight: 800; color: var(--accent); line-height: 1;
+}
+.hero-metric .hm-label {
+  font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em;
+  text-transform: uppercase; color: rgba(255,255,255,0.3); margin-top: 0.3rem;
+}
+
+.hero-actions { display: flex; gap: 1rem; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.9rem 2rem; background: var(--accent); color: var(--black);
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+}
+.btn-primary:hover { background: var(--accent-light); transform: translateY(-2px); }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.9rem 2rem; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7);
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Hero right — abstract forecast chart */
+.hero-right {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 5rem 4rem;
+}
+
+.forecast-visual {
+  width: 100%; max-width: 460px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(200,169,110,0.15);
+  padding: 2rem;
+  position: relative;
+}
+
+.fv-label {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.6rem;
+  font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(200,169,110,0.5); margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.fv-label::after { content:''; flex:1; height:1px; background: rgba(200,169,110,0.15); }
+
+/* SVG waveform */
+.fv-chart { width: 100%; }
+
+.fv-legend {
+  display: flex; gap: 1.5rem; margin-top: 1rem;
+}
+.fv-legend-item {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.6rem;
+  font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.fv-dot { width: 8px; height: 2px; }
+.fv-dot.actual { background: #e8c98e; }
+.fv-dot.predicted { background: #5b9bd5; }
+.fv-dot.confidence { background: rgba(255,255,255,0.2); height: 8px; }
+.fv-legend-item span { color: rgba(255,255,255,0.35); }
+
+/* NOW marker */
+.fv-now {
+  position: absolute; top: 3rem; 
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.55rem;
+  font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(200,169,110,0.6);
+  writing-mode: vertical-rl;
+}
+
+/* Status badges */
+.fv-badges {
+  display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap;
+}
+.fv-badge {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.35rem 0.75rem; border: 1px solid;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.6rem;
+  font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.fv-badge.ok { border-color: rgba(100,200,150,0.3); color: rgba(100,200,150,0.8); }
+.fv-badge.warn { border-color: rgba(200,169,110,0.4); color: var(--accent); }
+.fv-badge.alert { border-color: rgba(220,80,80,0.4); color: rgba(220,80,80,0.8); }
+.fv-badge i { font-size: 0.5rem; }
+
+/* ─── SECTIONS ─── */
+.section { padding: 8rem 6rem; }
+.section-dark { background: var(--charcoal); }
+.section-ink { background: var(--ink); }
+.section-light { background: var(--section-light); }
+
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ─── HOW IT WORKS (Flow) ─── */
+.flow-section {
+  background: var(--section-light);
+  padding: 8rem 6rem;
+}
+
+.split-header {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+  align-items: end; margin-bottom: 5rem;
+}
+.split-header h2 { font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase; line-height: 1; color: var(--black); }
+.split-header p { font-size: 1rem; color: var(--muted); max-width: 400px; }
+
+.flow-steps {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0; border: 1px solid #d8d5ce; margin-bottom: 4rem;
+}
+.flow-step {
+  padding: 2.5rem;
+  border-right: 1px solid #d8d5ce;
+  position: relative;
+  transition: background 0.3s;
+}
+.flow-step:last-child { border-right: none; }
+.flow-step:hover { background: var(--cream); }
+
+/* arrow connector */
+.flow-step::after {
+  content: '\f054';
+  font-family: 'Font Awesome 6 Free'; font-weight: 900;
+  position: absolute; right: -12px; top: 50%; transform: translateY(-50%);
+  font-size: 0.7rem; color: var(--accent-dark); z-index: 2;
+}
+.flow-step:last-child::after { display: none; }
+
+.flow-step-num {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-dark); margin-bottom: 1rem;
+}
+.flow-step-icon {
+  width: 48px; height: 48px; border: 1px solid #c8c5be;
+  display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;
+  transition: background 0.3s, border-color 0.3s;
+}
+.flow-step:hover .flow-step-icon { background: rgba(200,169,110,0.15); border-color: var(--accent-dark); }
+.flow-step-icon i { font-size: 1.1rem; color: var(--accent-dark); }
+.flow-step h3 {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 1.1rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--black); margin-bottom: 0.6rem;
+}
+.flow-step p { font-size: 0.875rem; color: var(--muted); line-height: 1.65; }
+
+.flow-image-wrap {
+  border: 1px solid #d8d5ce; overflow: hidden;
+  display: grid; grid-template-columns: 1fr;
+}
+.flow-image-wrap img { width: 100%; display: block; }
+.flow-image-caption {
+  padding: 1rem 1.5rem; background: var(--white);
+  border-top: 1px solid #e0ddd8;
+  font-size: 0.7rem; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #aaa;
+}
+
+/* ─── WORKING PRINCIPLE ─── */
+.principle-section {
+  background: var(--ink);
+  padding: 8rem 6rem;
+}
+
+.principle-layout {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+}
+
+.principle-text .label { display: block; margin-bottom: 1rem; }
+.principle-text h2 {
+  font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase;
+  color: var(--white); margin-bottom: 1.5rem; line-height: 1;
+}
+.principle-text > p { color: rgba(255,255,255,0.45); margin-bottom: 3rem; }
+
+.pipeline {
+  display: flex; flex-direction: column; gap: 0;
+}
+.pipeline-item {
+  display: grid; grid-template-columns: auto 1fr;
+  gap: 1.25rem; align-items: flex-start;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--border);
+  transition: padding-left 0.3s;
+  cursor: default;
+}
+.pipeline-item:last-child { border-bottom: 1px solid var(--border); }
+.pipeline-item:hover { padding-left: 0.5rem; }
+
+.pipeline-icon {
+  width: 36px; height: 36px; border: 1px solid rgba(200,169,110,0.25);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: background 0.3s;
+}
+.pipeline-item:hover .pipeline-icon { background: rgba(200,169,110,0.1); }
+.pipeline-icon i { font-size: 0.8rem; color: var(--accent); }
+
+.pipeline-body h4 {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em; color: var(--white); margin-bottom: 0.3rem;
+}
+.pipeline-body p { font-size: 0.85rem; color: rgba(255,255,255,0.35); line-height: 1.6; }
+
+.principle-image-col { position: relative; }
+.principle-image-col::before {
+  content: ''; position: absolute; inset: -1.5rem;
+  border: 1px solid rgba(200,169,110,0.1); pointer-events: none;
+}
+.principle-image-col img {
+  width: 100%; display: block;
+  filter: brightness(0.95) saturate(0.7);
+}
+.principle-image-col .img-caption {
+  margin-top: 1rem; font-size: 0.65rem; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,255,255,0.2); text-align: center;
+}
+
+/* ─── ABSTRACT DIVIDER ─── */
+.abstract-divider {
+  background: var(--black); padding: 5rem 6rem;
+  display: flex; align-items: center; gap: 3rem; overflow: hidden; position: relative;
+}
+.abstract-divider::after {
+  content: 'SEE TOMORROW';
+  position: absolute; right: 3rem;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 8rem; font-weight: 800;
+  color: rgba(200,169,110,0.04); text-transform: uppercase;
+  letter-spacing: -0.02em; white-space: nowrap; pointer-events: none;
+}
+.divider-line { flex: 1; height: 1px; background: linear-gradient(to right, var(--accent), transparent); }
+.divider-quote blockquote {
+  font-family: 'Barlow Condensed', sans-serif; font-size: clamp(1.5rem,2.5vw,2.5rem);
+  font-weight: 600; font-style: italic; color: var(--white); text-transform: uppercase; line-height: 1.1;
+}
+.divider-quote blockquote em { color: var(--accent); font-style: normal; }
+
+/* ─── DETECTION METHODS ─── */
+.detection-section {
+  background: var(--section-light);
+  padding: 8rem 6rem;
+}
+
+.detection-section h2 {
+  font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase;
+  color: var(--black); margin-bottom: 1rem; line-height: 1;
+}
+.detection-intro { color: var(--muted); max-width: 540px; margin-bottom: 5rem; }
+
+.detection-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5px;
+  background: #d8d5ce; margin-bottom: 4rem;
+}
+
+.detect-card {
+  background: var(--white); padding: 3rem;
+  transition: background 0.25s;
+}
+.detect-card:hover { background: var(--cream); }
+
+.detect-card-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 2rem;
+}
+.detect-card-title { }
+.detect-card-title .dc-num {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-dark); margin-bottom: 0.5rem;
+}
+.detect-card-title h3 {
+  font-size: 1.4rem; text-transform: uppercase; color: var(--black); line-height: 1;
+}
+.detect-card-icon {
+  width: 44px; height: 44px; border: 1px solid #c8c5be;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.detect-card-icon i { font-size: 1rem; color: var(--accent-dark); }
+
+.detect-card p { font-size: 0.9rem; color: var(--muted); margin-bottom: 1.75rem; line-height: 1.7; }
+
+.detect-image-wrap { border: 1px solid #e0ddd8; overflow: hidden; }
+.detect-image-wrap img { width: 100%; display: block; }
+.detect-image-caption {
+  padding: 0.6rem 1rem; border-top: 1px solid #e0ddd8;
+  font-size: 0.65rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #aaa;
+}
+
+/* ─── WARNING THRESHOLDS ─── */
+.threshold-section {
+  background: var(--black);
+  padding: 8rem 6rem;
+}
+
+.threshold-layout {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+}
+
+.threshold-text .label { display: block; margin-bottom: 1rem; }
+.threshold-text h2 {
+  font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase;
+  color: var(--white); margin-bottom: 1.5rem; line-height: 1;
+}
+.threshold-text > p { color: rgba(255,255,255,0.45); margin-bottom: 3rem; }
+
+.threshold-levels { display: flex; flex-direction: column; gap: 1rem; }
+
+.threshold-level {
+  display: grid; grid-template-columns: auto 1fr auto;
+  align-items: center; gap: 1.5rem; padding: 1.25rem 1.5rem;
+  border: 1px solid; transition: background 0.3s;
+}
+.threshold-level.normal {
+  border-color: rgba(100,200,150,0.2);
+  background: rgba(100,200,150,0.04);
+}
+.threshold-level.warning {
+  border-color: rgba(200,169,110,0.3);
+  background: rgba(200,169,110,0.06);
+}
+.threshold-level.alarm {
+  border-color: rgba(220,80,80,0.3);
+  background: rgba(220,80,80,0.04);
+}
+.threshold-level:hover { background: rgba(255,255,255,0.04); }
+
+.tl-indicator {
+  width: 10px; height: 10px; border-radius: 50%;
+}
+.normal .tl-indicator { background: rgba(100,200,150,0.8); box-shadow: 0 0 8px rgba(100,200,150,0.5); }
+.warning .tl-indicator { background: var(--accent); box-shadow: 0 0 8px rgba(200,169,110,0.5); animation: pulse 1.5s ease-in-out infinite; }
+.alarm .tl-indicator { background: rgba(220,80,80,0.8); box-shadow: 0 0 8px rgba(220,80,80,0.5); animation: pulse 0.8s ease-in-out infinite; }
+
+.tl-info h5 {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.85rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.25rem;
+}
+.normal .tl-info h5 { color: rgba(100,200,150,0.9); }
+.warning .tl-info h5 { color: var(--accent); }
+.alarm .tl-info h5 { color: rgba(220,80,80,0.9); }
+.tl-info p { font-size: 0.8rem; color: rgba(255,255,255,0.35); line-height: 1.5; }
+
+.tl-action {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; text-align: right; white-space: nowrap;
+}
+.normal .tl-action { color: rgba(100,200,150,0.5); }
+.warning .tl-action { color: rgba(200,169,110,0.6); }
+.alarm .tl-action { color: rgba(220,80,80,0.6); }
+
+.threshold-image-col { position: relative; }
+.threshold-image-col::before {
+  content: ''; position: absolute; inset: -1.5rem;
+  border: 1px solid rgba(200,169,110,0.08); pointer-events: none;
+}
+.threshold-image-col img { width: 100%; display: block; filter: brightness(0.9) saturate(0.8); }
+.threshold-image-col .img-caption {
+  margin-top: 1rem; font-size: 0.65rem; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,255,255,0.2); text-align: center;
+}
+
+/* ─── RUL ─── */
+.rul-section {
+  background: var(--charcoal);
+  padding: 8rem 6rem;
+}
+
+.rul-layout {
+  display: grid; grid-template-columns: 1.2fr 1fr; gap: 5rem; align-items: center;
+}
+
+.rul-image-col { position: relative; }
+.rul-image-col::before {
+  content: ''; position: absolute; inset: -1.5rem;
+  border: 1px solid rgba(200,169,110,0.1); pointer-events: none;
+}
+.rul-image-col img { width: 100%; display: block; filter: brightness(0.95) saturate(0.7); }
+.rul-image-col .img-caption {
+  margin-top: 1rem; font-size: 0.65rem; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,255,255,0.2); text-align: center;
+}
+
+.rul-text .label { display: block; margin-bottom: 1rem; }
+.rul-text h2 {
+  font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase;
+  color: var(--white); margin-bottom: 1.5rem; line-height: 1;
+}
+.rul-text > p { color: rgba(255,255,255,0.45); margin-bottom: 2.5rem; }
+
+.rul-features { display: flex; flex-direction: column; gap: 0; }
+.rul-feature {
+  display: flex; gap: 1.25rem; align-items: flex-start;
+  padding: 1.25rem 0; border-top: 1px solid var(--border);
+}
+.rul-feature:last-child { border-bottom: 1px solid var(--border); }
+.rul-feature-icon {
+  width: 36px; height: 36px; border: 1px solid rgba(200,169,110,0.25);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.rul-feature-icon i { font-size: 0.8rem; color: var(--accent); }
+.rul-feature-body h4 {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--white); margin-bottom: 0.3rem;
+}
+.rul-feature-body p { font-size: 0.85rem; color: rgba(255,255,255,0.35); line-height: 1.6; }
+
+/* ─── USE CASES ─── */
+.cases-section {
+  background: var(--section-light);
+  padding: 8rem 6rem;
+}
+
+.cases-section h2 {
+  font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase;
+  color: var(--black); margin-bottom: 1rem; line-height: 1;
+}
+.cases-intro { color: var(--muted); max-width: 500px; margin-bottom: 5rem; }
+
+.cases-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 0; border: 1px solid #d8d5ce;
+}
+
+.case-card {
+  padding: 3rem;
+  border-right: 1px solid #d8d5ce;
+  border-bottom: 1px solid #d8d5ce;
+  transition: background 0.25s;
+  cursor: default;
+}
+.case-card:nth-child(2n) { border-right: none; }
+.case-card:nth-last-child(-n+2) { border-bottom: none; }
+.case-card:hover { background: var(--cream); }
+
+.case-industry {
+  display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem;
+}
+.case-industry-icon {
+  width: 40px; height: 40px; border: 1px solid #c8c5be;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.3s;
+}
+.case-card:hover .case-industry-icon { background: rgba(200,169,110,0.15); }
+.case-industry-icon i { font-size: 0.9rem; color: var(--accent-dark); }
+.case-industry-name {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent-dark);
+}
+
+.case-card h3 {
+  font-size: 1.3rem; text-transform: uppercase; color: var(--black); margin-bottom: 1rem; line-height: 1.1;
+}
+.case-card .case-desc { font-size: 0.9rem; color: var(--muted); margin-bottom: 2rem; line-height: 1.7; }
+
+/* Scenario */
+.scenario-box {
+  background: var(--black); padding: 1.5rem 2rem; margin-bottom: 1.5rem;
+  border-left: 3px solid var(--accent); position: relative;
+}
+.scenario-box::before {
+  content: 'SCENARIO'; position: absolute; top: -0.6rem; left: 1.5rem;
+  background: var(--black); padding: 0 0.5rem;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.6rem; font-weight: 600;
+  letter-spacing: 0.2em; color: var(--accent);
+}
+.scenario-box p { font-size: 0.85rem; color: rgba(255,255,255,0.5); font-style: italic; line-height: 1.65; }
+
+.case-result {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1rem 0; border-top: 1px solid #e0ddd8;
+}
+.case-result i { font-size: 0.65rem; color: var(--accent-dark); flex-shrink: 0; }
+.case-result span { font-size: 0.85rem; color: var(--mid); font-weight: 400; }
+.case-result strong {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700; color: var(--accent-dark);
+  font-size: 1.1rem;
+}
+
+/* ─── BENEFITS ─── */
+.benefits-section {
+  background: var(--black);
+  padding: 8rem 6rem;
+}
+
+.benefits-section h2 {
+  font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase;
+  color: var(--white); margin-bottom: 1rem; line-height: 1;
+}
+.benefits-intro { color: rgba(255,255,255,0.35); max-width: 500px; margin-bottom: 5rem; }
+
+.benefits-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 0; border: 1px solid var(--border); margin-bottom: 4rem;
+}
+
+.benefit-card {
+  padding: 3rem 2.5rem; border-right: 1px solid var(--border);
+  position: relative; overflow: hidden; transition: background 0.3s;
+  cursor: default;
+}
+.benefit-card:last-child { border-right: none; }
+.benefit-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0;
+  width: 0; height: 2px; background: var(--accent); transition: width 0.4s ease;
+}
+.benefit-card:hover { background: rgba(200,169,110,0.04); }
+.benefit-card:hover::after { width: 100%; }
+
+.benefit-metric {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 3rem; font-weight: 800;
+  color: var(--accent); line-height: 1; margin-bottom: 0.5rem;
+}
+.benefit-card h4 {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--white); margin-bottom: 0.75rem;
+}
+.benefit-card p { font-size: 0.85rem; color: rgba(255,255,255,0.35); line-height: 1.65; }
+
+.benefit-bg-num {
+  position: absolute; top: 1rem; right: 1rem;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 5rem; font-weight: 800;
+  color: rgba(255,255,255,0.03); line-height: 1; pointer-events: none;
+}
+
+/* Traditional vs Predictive comparison */
+.compare-strip {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0; border: 1px solid var(--border);
+}
+.compare-side {
+  padding: 3rem;
+}
+.compare-side.old { border-right: 1px solid var(--border); }
+
+.compare-tag {
+  display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;
+}
+.compare-tag i { font-size: 0.65rem; }
+.compare-tag span {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+}
+.compare-side.old .compare-tag i,
+.compare-side.old .compare-tag span { color: rgba(255,255,255,0.25); }
+.compare-side.new .compare-tag i,
+.compare-side.new .compare-tag span { color: var(--accent); }
+
+.compare-side h3 {
+  font-size: 1.4rem; text-transform: uppercase; margin-bottom: 1.5rem;
+}
+.compare-side.old h3 { color: rgba(255,255,255,0.4); }
+.compare-side.new h3 { color: var(--white); }
+
+.compare-points { list-style: none; }
+.compare-points li {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  padding: 0.6rem 0; border-top: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+.compare-points li:last-child { border-bottom: 1px solid var(--border); }
+.compare-points li i { font-size: 0.7rem; margin-top: 4px; flex-shrink: 0; }
+.compare-side.old .compare-points li { color: rgba(255,255,255,0.3); }
+.compare-side.old .compare-points li i { color: rgba(255,255,255,0.2); }
+.compare-side.new .compare-points li { color: rgba(255,255,255,0.55); }
+.compare-side.new .compare-points li i { color: var(--accent); }
+
+/* ─── CTA ─── */
+.manifesto-strip {
+  background: var(--accent); padding: 4rem 6rem;
+  display: grid; grid-template-columns: 1fr auto; gap: 4rem; align-items: center;
+}
+.manifesto-strip h2 {
+  font-size: clamp(1.8rem,3vw,3rem); text-transform: uppercase;
+  color: var(--black); max-width: 700px;
+}
+.manifesto-strip h2 em { font-style: normal; text-decoration: underline; text-underline-offset: 6px; }
+
+.cta-section {
+  background: var(--charcoal); padding: 7rem 6rem;
+  display: grid; grid-template-columns: 1fr auto; gap: 4rem; align-items: center;
+}
+.cta-section h2 {
+  font-size: clamp(2rem,3.5vw,3.5rem); color: var(--white); text-transform: uppercase; max-width: 650px;
+}
+.cta-section h2 em { font-style: italic; font-weight: 300; color: var(--accent); }
+.cta-actions { display: flex; flex-direction: column; gap: 1rem; min-width: 200px; }
+
+.btn-whatsapp {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+  padding: 1rem 2rem; background: #25D366; color: var(--white);
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; transition: background 0.2s;
+}
+.btn-whatsapp:hover { background: #1ab555; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1100px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-left { padding: 5rem 3rem 3rem; }
+  .hero-right { padding: 3rem 3rem 5rem; }
+  .flow-section, .principle-section, .detection-section,
+  .threshold-section, .rul-section, .cases-section,
+  .benefits-section { padding: 6rem 3rem; }
+  .manifesto-strip, .cta-section { padding: 5rem 3rem; }
+  .principle-layout, .threshold-layout, .rul-layout { grid-template-columns: 1fr; gap: 3rem; }
+  .benefits-grid { grid-template-columns: repeat(2, 1fr); }
+  .benefit-card:nth-child(2n) { border-right: none; }
+  .benefit-card:nth-child(1), .benefit-card:nth-child(2) { border-bottom: 1px solid var(--border); }
+}
+
+@media (max-width: 900px) {
+  nav { padding: 0 1.5rem; }
+  .hero-left { padding: 4rem 2rem 2rem; }
+  .hero-right { display: none; }
+  .split-header { grid-template-columns: 1fr; gap: 1.5rem; }
+  .flow-steps { grid-template-columns: 1fr; }
+  .flow-step { border-right: none; border-bottom: 1px solid #d8d5ce; }
+  .flow-step::after { display: none; }
+  .flow-step:last-child { border-bottom: none; }
+  .detection-grid { grid-template-columns: 1fr; gap: 1.5px; }
+  .cases-grid { grid-template-columns: 1fr; }
+  .case-card { border-right: none; }
+  .case-card:nth-last-child(-n+2) { border-bottom: 1px solid #d8d5ce; }
+  .case-card:last-child { border-bottom: none; }
+  .compare-strip { grid-template-columns: 1fr; }
+  .compare-side.old { border-right: none; border-bottom: 1px solid var(--border); }
+  .manifesto-strip, .cta-section { grid-template-columns: 1fr; gap: 2rem; }
+  .flow-section, .principle-section, .detection-section,
+  .threshold-section, .rul-section, .cases-section,
+  .benefits-section { padding: 5rem 2rem; }
+  .manifesto-strip, .cta-section { padding: 4rem 2rem; }
+}
+
+@media (max-width: 600px) {
+  .hero-left { padding: 4rem 1.5rem 3rem; }
+  .hero-actions { flex-direction: column; }
+  .benefits-grid { grid-template-columns: 1fr; }
+  .benefit-card { border-right: none; border-bottom: 1px solid var(--border); }
+  .benefit-card:last-child { border-bottom: none; }
+  .flow-section, .principle-section, .detection-section,
+  .threshold-section, .rul-section, .cases-section,
+  .benefits-section { padding: 4rem 1.5rem; }
+  .manifesto-strip, .cta-section { padding: 3rem 1.5rem; }
+  .abstract-divider { padding: 3rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <span class="nav-logo-text">Zero Eleven</span>
+  </a>
+  <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Home</a>
+  <a href="https://api.whatsapp.com/send?phone=6281243953947" target="_blank" class="nav-cta-btn">
+    <i class="fab fa-whatsapp"></i> Talk to Us
+  </a>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-breadcrumb">
+      <span class="bc-parent">Capabilities</span>
+      <span class="bc-sep">/</span>
+      <span class="bc-current">02</span>
+    </div>
+
+    <div class="capability-badge">
+      <div class="badge-dot"></div>
+      <span>Predictive Operations Platform</span>
+    </div>
+
+    <h1>
+      See<br>
+      Tomorrow,<br>
+      <em>Act Today</em>
+    </h1>
+
+    <p class="hero-subhead">"AI-powered analytics that forecast outcomes before they happen."</p>
+
+    <div class="hero-metrics">
+      <div class="hero-metric">
+        <div class="hm-num">7 days</div>
+        <div class="hm-label">Prediction Horizon</div>
+      </div>
+      <div class="hero-metric">
+        <div class="hm-num">78%</div>
+        <div class="hm-label">Downtime Reduction</div>
+      </div>
+      <div class="hero-metric">
+        <div class="hm-num">3.2×</div>
+        <div class="hm-label">Equipment Lifespan</div>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a href="#how-it-works" class="btn-primary">How It Works <i class="fas fa-arrow-down"></i></a>
+      <a href="#cases" class="btn-ghost">See Use Cases</a>
+    </div>
+  </div>
+
+  <!-- Hero Right: Abstract Forecast Visual -->
+  <div class="hero-right">
+    <div class="forecast-visual">
+      <div class="fv-label">Live Prediction Feed · Equipment TE-232DA</div>
+
+      <!-- SVG Waveform Chart -->
+      <svg class="fv-chart" viewBox="0 0 420 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Grid lines -->
+        <line x1="0" y1="36" x2="420" y2="36" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <line x1="0" y1="72" x2="420" y2="72" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <line x1="0" y1="108" x2="420" y2="108" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <line x1="0" y1="144" x2="420" y2="144" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+        <!-- Vertical NOW line -->
+        <line x1="240" y1="0" x2="240" y2="180" stroke="rgba(200,169,110,0.3)" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="243" y="16" fill="rgba(200,169,110,0.6)" font-size="8" font-family="'Barlow Condensed'" letter-spacing="1" font-weight="600">NOW</text>
+
+        <!-- Confidence band (future) -->
+        <path d="M240 100 C270 98 300 94 330 85 C360 76 390 65 420 52" stroke="none" fill="rgba(91,155,213,0.08)"/>
+        <path d="M240 100 C270 104 300 108 330 102 C360 96 390 85 420 72 L420 52 C390 65 360 76 330 85 C300 94 270 98 240 100Z" fill="rgba(91,155,213,0.08)"/>
+
+        <!-- Predicted line (future, dashed blue) -->
+        <path d="M240 100 C270 101 300 101 330 93.5 C360 86 390 75 420 62" stroke="#5b9bd5" stroke-width="1.5" stroke-dasharray="5,3" fill="none"/>
+
+        <!-- Actual signal (past — gold) -->
+        <path d="M0 130 C15 128 25 125 35 120 C50 113 55 118 70 115 C85 112 90 108 105 105 C120 102 125 106 140 103 C155 100 160 95 175 90 C190 85 195 88 210 85 C225 82 230 88 240 100" stroke="#c8a96e" stroke-width="2" fill="none"/>
+
+        <!-- Predicted match (past — blue, under actual) -->
+        <path d="M0 132 C15 130 25 127 35 122 C50 116 55 120 70 117 C85 114 90 110 105 107 C120 104 125 108 140 105 C155 102 160 97 175 92 C190 88 195 91 210 87 C225 84 230 90 240 100" stroke="#5b9bd5" stroke-width="1.5" stroke-dasharray="3,2" fill="none" opacity="0.7"/>
+
+        <!-- High Alert line -->
+        <line x1="0" y1="30" x2="420" y2="30" stroke="rgba(220,80,80,0.4)" stroke-width="1" stroke-dasharray="6,3"/>
+        <text x="5" y="27" fill="rgba(220,80,80,0.6)" font-size="7" font-family="'Barlow Condensed'" letter-spacing="1">HIGH ALERT</text>
+
+        <!-- Warning line -->
+        <line x1="0" y1="60" x2="420" y2="60" stroke="rgba(200,169,110,0.4)" stroke-width="1" stroke-dasharray="6,3"/>
+        <text x="5" y="57" fill="rgba(200,169,110,0.6)" font-size="7" font-family="'Barlow Condensed'" letter-spacing="1">WARNING</text>
+
+        <!-- Anomaly marker -->
+        <circle cx="210" cy="85" r="5" fill="rgba(220,80,80,0)" stroke="rgba(220,80,80,0.7)" stroke-width="1.5"/>
+        <circle cx="210" cy="85" r="2" fill="rgba(220,80,80,0.8)"/>
+
+        <!-- Estimated hit point -->
+        <circle cx="390" cy="65" r="4" fill="rgba(220,80,80,0)" stroke="rgba(220,80,80,0.5)" stroke-width="1" stroke-dasharray="2,1"/>
+
+        <!-- RUL bracket -->
+        <line x1="240" y1="170" x2="390" y2="170" stroke="rgba(200,169,110,0.3)" stroke-width="1"/>
+        <line x1="240" y1="165" x2="240" y2="175" stroke="rgba(200,169,110,0.3)" stroke-width="1"/>
+        <line x1="390" y1="165" x2="390" y2="175" stroke="rgba(200,169,110,0.3)" stroke-width="1"/>
+        <text x="290" y="179" fill="rgba(200,169,110,0.5)" font-size="7" font-family="'Barlow Condensed'" letter-spacing="1" text-anchor="middle">RUL ESTIMATE</text>
+      </svg>
+
+      <div class="fv-legend">
+        <div class="fv-legend-item"><div class="fv-dot actual"></div><span>Actual Signal</span></div>
+        <div class="fv-legend-item"><div class="fv-dot predicted"></div><span>Predicted Signal</span></div>
+        <div class="fv-legend-item"><div class="fv-dot confidence"></div><span>Confidence Band</span></div>
+      </div>
+
+      <div class="fv-badges">
+        <div class="fv-badge ok"><i class="fas fa-circle"></i> Normal Operation</div>
+        <div class="fv-badge warn"><i class="fas fa-circle"></i> Pattern Shift Detected</div>
+        <div class="fv-badge alert"><i class="fas fa-circle"></i> Failure in ~7 Days</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS: 3-STEP FLOW ─── -->
+<section class="flow-section reveal" id="how-it-works">
+  <div class="split-header">
+    <div>
+      <span class="label" style="color:var(--accent-dark);display:block;margin-bottom:0.75rem">The Intelligence Pipeline</span>
+      <h2>From Raw Data<br>to Early Warning</h2>
+    </div>
+    <p>Three stages — historical learning, pattern recognition, and real-time alerting — working as a single continuous intelligence loop.</p>
+  </div>
+
+  <div class="flow-steps">
+    <div class="flow-step reveal">
+      <div class="flow-step-num">Stage 01</div>
+      <div class="flow-step-icon"><i class="fas fa-database"></i></div>
+      <h3>Historical Data Learning</h3>
+      <p>The system ingests months of sensor data — temperatures, pressures, vibration, flow rates — learning what "normal" looks like for your specific equipment under your specific operating conditions.</p>
+    </div>
+    <div class="flow-step reveal" style="transition-delay:0.1s">
+      <div class="flow-step-num">Stage 02</div>
+      <div class="flow-step-icon"><i class="fas fa-brain"></i></div>
+      <h3>Pattern Recognition</h3>
+      <p>Advanced algorithms build operational profiles — identifying complex multi-variable patterns that precede failure, invisible to any single-sensor threshold system.</p>
+    </div>
+    <div class="flow-step reveal" style="transition-delay:0.2s">
+      <div class="flow-step-num">Stage 03</div>
+      <div class="flow-step-icon"><i class="fas fa-bell"></i></div>
+      <h3>Early Warning Surfaced</h3>
+      <p>Deviations from normal operational profiles are identified the moment they emerge — before the actual signal reaches any static alarm limit. Your team acts on probability, not confirmed damage.</p>
+    </div>
+  </div>
+
+  <div class="flow-image-wrap reveal">
+    <img src="sources/flow-predictiveMaintenance.png" alt="Predictive Maintenance Flow: Historical Data → Pattern Recognition → Early Warning">
+    <div class="flow-image-caption">
+      <i class="fas fa-info-circle"></i> &nbsp;
+      Predictive Maintenance Flow · Zero Eleven Operations Intelligence
+    </div>
+  </div>
+</section>
+
+<!-- ─── WORKING PRINCIPLE / ARCHITECTURE ─── -->
+<section class="principle-section reveal" id="architecture">
+  <div class="principle-layout">
+    <div class="principle-text">
+      <span class="label">System Architecture</span>
+      <h2>From Sensor<br>to Prescription</h2>
+      <p>Every data source feeds into a single unified intelligence layer. The system doesn't just detect — it diagnoses and prescribes.</p>
+
+      <div class="pipeline">
+        <div class="pipeline-item">
+          <div class="pipeline-icon"><i class="fas fa-plug"></i></div>
+          <div class="pipeline-body">
+            <h4>Data Ingestion</h4>
+            <p>SCADA, DCS, and instrumented sensor data ingested in real time. Historical and online streams unified into a single data fabric.</p>
+          </div>
+        </div>
+        <div class="pipeline-item">
+          <div class="pipeline-icon"><i class="fas fa-project-diagram"></i></div>
+          <div class="pipeline-body">
+            <h4>Advanced Pattern Recognition</h4>
+            <p>Historical data trains models to build normal operational profiles. Deviations in live data are scored against learned baselines.</p>
+          </div>
+        </div>
+        <div class="pipeline-item">
+          <div class="pipeline-icon"><i class="fas fa-search"></i></div>
+          <div class="pipeline-body">
+            <h4>Anomaly Detection</h4>
+            <p>Real-time comparison of actual vs. predicted values. Residual gaps that exceed learned confidence bands trigger immediate investigation.</p>
+          </div>
+        </div>
+        <div class="pipeline-item">
+          <div class="pipeline-icon"><i class="fas fa-stethoscope"></i></div>
+          <div class="pipeline-body">
+            <h4>Fault Diagnostic</h4>
+            <p>When anomalies are confirmed, the system identifies the contributing factors — root cause analysis without manual investigation.</p>
+          </div>
+        </div>
+        <div class="pipeline-item">
+          <div class="pipeline-icon"><i class="fas fa-tools"></i></div>
+          <div class="pipeline-body">
+            <h4>Prescription Action</h4>
+            <p>The final output is actionable: a specific maintenance recommendation, parts list, or operational adjustment — not just an alarm.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="principle-image-col">
+      <img src="sources/working-principle.png" alt="PRiSM Predictive Analytic Architecture: SCADA/DCS → Pattern Recognition → Anomaly Detection → Fault Diagnostic → Prescription">
+      <p class="img-caption">System Architecture · Data-to-Action Intelligence Pipeline</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ABSTRACT DIVIDER ─── -->
+<div class="abstract-divider">
+  <div class="divider-line"></div>
+  <div class="divider-quote">
+    <blockquote>
+      "Stop reacting to damage.<br>
+      Start acting on <em>probability</em>."
+    </blockquote>
+  </div>
+</div>
+
+<!-- ─── DETECTION METHODS ─── -->
+<section class="detection-section reveal" id="detection">
+  <span class="label" style="color:var(--accent-dark);display:block;margin-bottom:1rem">Detection Intelligence</span>
+  <h2>Two Layers of<br>Predictive Detection</h2>
+  <p class="detection-intro">Traditional monitoring waits for a threshold breach. Our system detects the early signal of drift — days before any damage occurs.</p>
+
+  <div class="detection-grid">
+    <!-- Card 1: Traditional vs Predictive -->
+    <div class="detect-card reveal">
+      <div class="detect-card-header">
+        <div class="detect-card-title">
+          <div class="dc-num">Method 01</div>
+          <h3>Residual Signal<br>Anomaly Detection</h3>
+        </div>
+        <div class="detect-card-icon"><i class="fas fa-chart-line"></i></div>
+      </div>
+      <p>Traditional monitoring relies on fixed alarm limits — by the time the signal crosses the threshold, damage is already accumulating. Our approach compares the <strong style="color:var(--accent-dark);font-weight:600">actual sensor signal</strong> against the <strong style="color:var(--accent-dark);font-weight:600">AI-estimated signal</strong>. The moment these diverge beyond the confidence band, an anomaly is flagged — regardless of whether the signal has crossed any static threshold.</p>
+      <div class="detect-image-wrap">
+        <img src="sources/traditional-vs-predictive-monitoring.png" alt="Traditional monitoring vs predictive residual detection — anomaly identified earlier">
+        <div class="detect-image-caption">
+          <i class="fas fa-circle" style="color:rgba(220,80,80,0.6);font-size:0.5rem"></i> &nbsp;
+          Anomaly caught at residual divergence — far before alarm limit reached
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Clustering Classification -->
+    <div class="detect-card reveal" style="transition-delay:0.1s">
+      <div class="detect-card-header">
+        <div class="detect-card-title">
+          <div class="dc-num">Method 02</div>
+          <h3>Failure Pattern<br>Classification</h3>
+        </div>
+        <div class="detect-card-icon"><i class="fas fa-object-group"></i></div>
+      </div>
+      <p>Historical failure data is organized into <strong style="color:var(--accent-dark);font-weight:600">behavioral clusters</strong> — groupings of sensor patterns that preceded known failure events. When live operational data begins drifting outside its normal cluster and toward a historical failure cluster, the system raises a pre-failure warning with the matching failure mode identified.</p>
+      <div class="detect-image-wrap">
+        <img src="sources/classification-predictionFailure.png" alt="Failure prediction via clustering — actual values escaping normal cluster boundary">
+        <div class="detect-image-caption">
+          <i class="fas fa-circle" style="color:rgba(200,169,110,0.6);font-size:0.5rem"></i> &nbsp;
+          Actual values escaping normal cluster — failure mode matched
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Monitoring anomalies -->
+    <div class="detect-card reveal" style="transition-delay:0.15s">
+      <div class="detect-card-header">
+        <div class="detect-card-title">
+          <div class="dc-num">Method 03</div>
+          <h3>Continuous Signal<br>Monitoring</h3>
+        </div>
+        <div class="detect-card-icon"><i class="fas fa-wave-square"></i></div>
+      </div>
+      <p>The system runs a continuous live comparison — actual reading versus what the model predicts it should be. The residual (gap between the two signals) is tracked in real time. When the residual grows beyond the learned confidence interval for that operating condition, an anomaly event is logged and triaged.</p>
+      <div class="detect-image-wrap">
+        <img src="sources/monitoring-for-anomalies.png" alt="Actual vs predicted signal monitoring — residual gap detection with anomaly event marker">
+        <div class="detect-image-caption">
+          <i class="fas fa-circle" style="color:rgba(91,155,213,0.6);font-size:0.5rem"></i> &nbsp;
+          Residual divergence between actual and estimated signal triggers anomaly
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Warning / Alarm levels -->
+    <div class="detect-card reveal" style="transition-delay:0.2s">
+      <div class="detect-card-header">
+        <div class="detect-card-title">
+          <div class="dc-num">Method 04</div>
+          <h3>Graduated Warning<br>& Alarm System</h3>
+        </div>
+        <div class="detect-card-icon"><i class="fas fa-sliders-h"></i></div>
+      </div>
+      <p>Not all anomalies are emergencies. The system uses a <strong style="color:var(--accent-dark);font-weight:600">graduated threshold model</strong> — Overall Model Residual (OMR) levels trigger distinct responses. Early warning gives teams time to plan. A confirmed alarm escalates to immediate action. No false urgency, no missed signals.</p>
+      <div class="detect-image-wrap">
+        <img src="sources/warning-and-alarm-threshold.png" alt="Warning and alarm thresholds on model residual — graduated response system">
+        <div class="detect-image-caption">
+          <i class="fas fa-circle" style="color:rgba(200,169,110,0.6);font-size:0.5rem"></i> Warning threshold &nbsp;
+          <i class="fas fa-circle" style="color:rgba(220,80,80,0.6);font-size:0.5rem"></i> Alarm threshold
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WARNING THRESHOLDS ─── -->
+<section class="threshold-section reveal">
+  <div class="threshold-layout">
+    <div class="threshold-text">
+      <span class="label">Alert Architecture</span>
+      <h2>Graduated<br>Response Levels</h2>
+      <p>The system doesn't just alert — it tells you how urgent, why it matters, and what to do. Three distinct response levels, each with prescribed action protocols.</p>
+
+      <div class="threshold-levels">
+        <div class="threshold-level normal">
+          <div class="tl-indicator"></div>
+          <div class="tl-info">
+            <h5>Normal Operation</h5>
+            <p>Residual within learned confidence band. Equipment tracking as expected. Continuous monitoring active.</p>
+          </div>
+          <div class="tl-action">Monitor</div>
+        </div>
+        <div class="threshold-level warning">
+          <div class="tl-indicator"></div>
+          <div class="tl-info">
+            <h5>Warning — Pattern Shift</h5>
+            <p>OMR exceeds warning threshold. Early behavioral drift detected. Schedule inspection within 7 days. Failure classification in progress.</p>
+          </div>
+          <div class="tl-action">Plan →</div>
+        </div>
+        <div class="threshold-level alarm">
+          <div class="tl-indicator"></div>
+          <div class="tl-info">
+            <h5>Alarm — Imminent Failure</h5>
+            <p>OMR exceeds alarm threshold. Failure trajectory confirmed. Immediate intervention required. Prescription action issued.</p>
+          </div>
+          <div class="tl-action">Act Now →</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="threshold-image-col">
+      <img src="sources/warning-and-alarm-threshold.png" alt="Overall Model Residual warning and alarm threshold chart">
+      <p class="img-caption">Overall Model Residual (OMR) · Warning & Alarm Threshold Monitoring</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── REMAINING USEFUL LIFE ─── -->
+<section class="rul-section reveal">
+  <div class="rul-layout">
+    <div class="rul-image-col">
+      <img src="sources/remaining-useful-life-estimate.png" alt="Remaining Useful Life Estimate — actual past behavior vs estimated future behavior with RUL bracket">
+      <p class="img-caption">Remaining Useful Life Estimate · Actual vs Projected Degradation Trajectory</p>
+    </div>
+
+    <div class="rul-text">
+      <span class="label">Failure Forecasting</span>
+      <h2>Remaining<br>Useful Life<br>Estimate</h2>
+      <p>Beyond anomaly detection — the system projects how long each asset has before reaching its failure threshold. Maintenance is planned with precision, not guesswork.</p>
+
+      <div class="rul-features">
+        <div class="rul-feature">
+          <div class="rul-feature-icon"><i class="fas fa-history"></i></div>
+          <div class="rul-feature-body">
+            <h4>Actual Past Behavior</h4>
+            <p>The system anchors its forecast on the real measured degradation trajectory — not generic failure curves or manufacturer specifications.</p>
+          </div>
+        </div>
+        <div class="rul-feature">
+          <div class="rul-feature-icon"><i class="fas fa-arrow-trend-up"></i></div>
+          <div class="rul-feature-body">
+            <h4>Estimated Future Behavior</h4>
+            <p>From the current state, the model projects the most probable degradation path — with upper and lower confidence bounds defining the uncertainty envelope.</p>
+          </div>
+        </div>
+        <div class="rul-feature">
+          <div class="rul-feature-icon"><i class="fas fa-hourglass-half"></i></div>
+          <div class="rul-feature-body">
+            <h4>Time-to-Failure Window</h4>
+            <p>The RUL estimate gives your maintenance team a concrete time window — from "now" to the projected first breach of the high-alert threshold. Plan resources, not emergencies.</p>
+          </div>
+        </div>
+        <div class="rul-feature">
+          <div class="rul-feature-icon"><i class="fas fa-sync-alt"></i></div>
+          <div class="rul-feature-body">
+            <h4>Continuously Updated</h4>
+            <p>As new data arrives every cycle, the RUL estimate is recalculated. If operating conditions improve, the window extends. If they worsen, alerts escalate immediately.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── USE CASES ─── -->
+<section class="cases-section reveal" id="cases">
+  <span class="label" style="color:var(--accent-dark);display:block;margin-bottom:1rem">Industries We Serve</span>
+  <h2>Predictive Intelligence<br>Across Sectors</h2>
+  <p class="cases-intro">Four industries. Four critical problems. One platform that anticipates failure before it costs you production, revenue, or safety.</p>
+
+  <div class="cases-grid">
+
+    <!-- Mining -->
+    <div class="case-card reveal">
+      <div class="case-industry">
+        <div class="case-industry-icon"><i class="fas fa-mountain"></i></div>
+        <span class="case-industry-name">Mining</span>
+      </div>
+      <h3>Haul Truck &<br>Conveyor Failure Prevention</h3>
+      <p class="case-desc">Every unplanned stoppage in a mining operation costs $80K–$200K per hour. Conveyor belt failures cascade into total production halts lasting days.</p>
+
+      <div class="scenario-box">
+        <p>A haul truck's hydraulic system begins showing subtle bearing frequency shifts 9 days before actual failure. No traditional DCS alarm is triggered. The Predictive Operations Platform issues a warning on day 3 — giving the team a 6-day maintenance window.</p>
+      </div>
+
+      <div class="case-result">
+        <i class="fas fa-chart-line"></i>
+        <span><strong>78%</strong> reduction in unplanned equipment downtime</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-clock"></i>
+        <span>Average early warning lead time: <strong>4.2 hours</strong></span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-dollar-sign"></i>
+        <span>Estimated annual savings: <strong>$2.1M+</strong> per fleet</span>
+      </div>
+    </div>
+
+    <!-- Manufacturing -->
+    <div class="case-card reveal" style="transition-delay:0.1s">
+      <div class="case-industry">
+        <div class="case-industry-icon"><i class="fas fa-industry"></i></div>
+        <span class="case-industry-name">Manufacturing</span>
+      </div>
+      <h3>Production Machine<br>Maintenance Optimization</h3>
+      <p class="case-desc">Fixed-interval maintenance schedules either over-service healthy machines or miss degrading ones. Neither approach is efficient.</p>
+
+      <div class="scenario-box">
+        <p>A CNC machine spindle shows micro-vibration anomalies outside its learned cluster. The system projects RUL at 11 days — perfectly timed for the upcoming weekend maintenance window. No emergency shutdown required.</p>
+      </div>
+
+      <div class="case-result">
+        <i class="fas fa-tools"></i>
+        <span>Maintenance scheduled <strong>only when needed</strong> — condition-based</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-cogs"></i>
+        <span><strong>3.2×</strong> extended equipment lifespan through optimized operation</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-percentage"></i>
+        <span><strong>40%</strong> reduction in maintenance labor costs</span>
+      </div>
+    </div>
+
+    <!-- Utilities -->
+    <div class="case-card reveal" style="transition-delay:0.2s">
+      <div class="case-industry">
+        <div class="case-industry-icon"><i class="fas fa-bolt"></i></div>
+        <span class="case-industry-name">Energy & Utilities</span>
+      </div>
+      <h3>Electrical Grid<br>Overload Prediction</h3>
+      <p class="case-desc">Grid operators manage massive load variation across weather cycles, demand surges, and equipment aging — with limited visibility into failure probability.</p>
+
+      <div class="scenario-box">
+        <p>A transformer shows thermal residual drift consistent with the pre-overload cluster from historical data. The system flags it 5 days before a projected high-demand weather event — giving the grid operator time to reroute load and pre-position maintenance crews.</p>
+      </div>
+
+      <div class="case-result">
+        <i class="fas fa-shield-alt"></i>
+        <span>Grid stability improved — <strong>zero unplanned outages</strong> in 12 months</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-calendar-check"></i>
+        <span>Load rerouting executed <strong>5 days in advance</strong> of projected fault</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-users"></i>
+        <span>Regulatory compliance maintained — no SLA breach events</span>
+      </div>
+    </div>
+
+    <!-- Transportation -->
+    <div class="case-card reveal" style="transition-delay:0.3s">
+      <div class="case-industry">
+        <div class="case-industry-icon"><i class="fas fa-truck"></i></div>
+        <span class="case-industry-name">Transportation</span>
+      </div>
+      <h3>Fleet Degradation<br>Forecasting</h3>
+      <p class="case-desc">Fleet operators struggle to balance vehicle availability with preventive maintenance. Breakdowns on-route cost customer SLAs, recovery logistics, and driver safety.</p>
+
+      <div class="scenario-box">
+        <p>A delivery truck's brake system shows friction wear patterns crossing the boundary of its historical failure cluster. RUL is estimated at 8 days. The vehicle is swapped out at the next scheduled depot stop — before any breakdown occurs.</p>
+      </div>
+
+      <div class="case-result">
+        <i class="fas fa-route"></i>
+        <span><strong>92%</strong> fleet availability maintained at all times</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-map-marked-alt"></i>
+        <span>Zero in-route breakdowns across monitored fleet — <strong>12 months</strong></span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-percentage"></i>
+        <span><strong>28%</strong> reduction in total fleet operating costs</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── BENEFITS ─── -->
+<section class="benefits-section reveal" id="benefits">
+  <span class="label" style="display:block;margin-bottom:1rem">Measured Outcomes</span>
+  <h2>Results That<br>Speak for Themselves</h2>
+  <p class="benefits-intro">Four measurable outcomes. Every client engagement is defined by numbers — not promises.</p>
+
+  <div class="benefits-grid">
+    <div class="benefit-card">
+      <div class="benefit-bg-num">01</div>
+      <div class="benefit-metric">78%</div>
+      <h4>Reduced Unplanned Downtime</h4>
+      <p>Failures caught days before occurrence eliminate unplanned stoppages entirely — replaced by scheduled, precision maintenance windows.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-bg-num">02</div>
+      <div class="benefit-metric">3.2×</div>
+      <h4>Extended Equipment Lifespan</h4>
+      <p>Condition-based maintenance and optimized operating parameters dramatically reduce wear accumulation on critical components.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-bg-num">03</div>
+      <div class="benefit-metric">40%</div>
+      <h4>Lower Maintenance Cost</h4>
+      <p>No more over-servicing healthy equipment or emergency callouts. Maintenance resources deployed exactly where and when needed.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-bg-num">04</div>
+      <div class="benefit-metric">7 days</div>
+      <h4>Prediction Accuracy Horizon</h4>
+      <p>Early warning issued up to 7 days before projected failure threshold breach — giving teams a full planning window for every intervention.</p>
+    </div>
+  </div>
+
+  <!-- Traditional vs Predictive comparison -->
+  <div class="compare-strip reveal">
+    <div class="compare-side old">
+      <div class="compare-tag">
+        <i class="fas fa-times-circle"></i>
+        <span>Traditional Condition Monitoring</span>
+      </div>
+      <h3>Fixed Limits,<br>Delayed Response</h3>
+      <ul class="compare-points">
+        <li><i class="fas fa-minus"></i> Constant static alarm limits — same threshold regardless of operating context</li>
+        <li><i class="fas fa-minus"></i> Damage accumulates before signal crosses the limit</li>
+        <li><i class="fas fa-minus"></i> Single-sensor alarms — no cross-variable pattern awareness</li>
+        <li><i class="fas fa-minus"></i> No failure mode identification — just a number out of range</li>
+        <li><i class="fas fa-minus"></i> Operator fatigue from false positive alarms</li>
+        <li><i class="fas fa-minus"></i> Reactive maintenance schedule — you respond to what already happened</li>
+      </ul>
+    </div>
+    <div class="compare-side new">
+      <div class="compare-tag">
+        <i class="fas fa-check-circle"></i>
+        <span>Zero Eleven Predictive Operations</span>
+      </div>
+      <h3>Residual Detection,<br>Days Ahead</h3>
+      <ul class="compare-points">
+        <li><i class="fas fa-check"></i> Dynamic confidence bands — adapts to operating conditions in real time</li>
+        <li><i class="fas fa-check"></i> Anomaly detected at residual divergence — before any damage accumulates</li>
+        <li><i class="fas fa-check"></i> Multi-variable pattern recognition across hundreds of simultaneous signals</li>
+        <li><i class="fas fa-check"></i> Failure mode identified — fault diagnostic tells you exactly what's failing</li>
+        <li><i class="fas fa-check"></i> Graduated warning system — only actionable alerts, no noise</li>
+        <li><i class="fas fa-check"></i> Proactive maintenance window — you plan for what's about to happen</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MANIFESTO STRIP ─── -->
+<div class="manifesto-strip">
+  <h2>
+    The companies that <em>win</em> in the next decade of industrial operations<br>
+    will not be the fastest to <em>respond to failures</em>.<br>
+    They will be the ones who <em>never let failures happen</em>.
+  </h2>
+  <a href="https://api.whatsapp.com/send?phone=6281243953947" target="_blank" class="btn-primary" style="background:var(--black);color:var(--white);white-space:nowrap">
+    Deploy Predictive AI <i class="fas fa-arrow-right"></i>
+  </a>
+</div>
+
+<!-- ─── CTA ─── -->
+<div class="cta-section" id="contact">
+  <h2>See Tomorrow in<br>Your <em>Own</em> Operations?</h2>
+  <div class="cta-actions">
+    <a href="https://api.whatsapp.com/send?phone=6281243953947" target="_blank" class="btn-whatsapp">
+      <i class="fab fa-whatsapp"></i> Start a Conversation
+    </a>
+    <a href="index.html#process" class="btn-ghost" style="border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);justify-content:center">
+      See Our Process
+    </a>
+  </div>
+</div>
+
+<script>
+// Scroll Reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+
+// Animate hero SVG waveform (subtle pulse on anomaly dot)
+const anomalyDot = document.querySelector('.fv-chart circle');
+</script>
+</body>
+</html>

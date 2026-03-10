@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visual Intelligence Systems — Zero Eleven</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=Barlow+Condensed:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black: #0a0a0a;
+  --charcoal: #141414;
+  --ink: #1e1e1e;
+  --mid: #555;
+  --muted: #888;
+  --border: rgba(255,255,255,0.08);
+  --white: #ffffff;
+  --cream: #ede9e1;
+  --accent: #c8a96e;
+  --accent-dark: #a8893e;
+  --accent-light: #e8c98e;
+  --section-light: #f7f5f0;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--white);
+  color: var(--black);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem; font-weight: 600;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent);
+}
+h1, h2, h3 { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; line-height: 1.05; }
+p { font-weight: 300; line-height: 1.7; color: var(--mid); }
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  padding: 0 3rem; height: 72px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(10,10,10,0.96); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { display: flex; align-items: center; gap: 1rem; text-decoration: none; }
+.nav-logo-text {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 1.4rem; font-weight: 700;
+  letter-spacing: 0.05em; color: var(--white); text-transform: uppercase;
+}
+.nav-back {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-size: 0.75rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.5); text-decoration: none; transition: color 0.2s;
+}
+.nav-back:hover { color: var(--accent); }
+.nav-cta-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1.4rem; background: var(--accent); color: var(--black);
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; transition: background 0.2s;
+}
+.nav-cta-btn:hover { background: var(--accent-light); }
+
+/* ─── BUTTONS ─── */
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.9rem 2rem; background: var(--accent); color: var(--black);
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+}
+.btn-primary:hover { background: var(--accent-light); transform: translateY(-2px); }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.9rem 2rem; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7);
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ─── REVEAL ─── */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ═══════════════════════════════════════
+   HERO
+═══════════════════════════════════════ */
+.hero {
+  padding-top: 72px;
+  min-height: 100vh;
+  background: var(--black);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Scanline texture */
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px, rgba(255,255,255,0.008) 4px
+  );
+  pointer-events: none; z-index: 1;
+}
+
+/* Light cone from top-right */
+.hero::after {
+  content: '';
+  position: absolute;
+  top: -10%; right: -5%;
+  width: 700px; height: 700px;
+  background: conic-gradient(
+    from 200deg at 80% 10%,
+    transparent 0deg,
+    rgba(200,169,110,0.04) 20deg,
+    rgba(200,169,110,0.08) 35deg,
+    rgba(200,169,110,0.04) 50deg,
+    transparent 70deg
+  );
+  pointer-events: none; z-index: 1;
+}
+
+.hero-left {
+  position: relative; z-index: 2;
+  padding: 5rem 4rem 5rem 6rem;
+  display: flex; flex-direction: column; justify-content: center;
+}
+
+.hero-breadcrumb {
+  display: flex; align-items: center; gap: 0.75rem; margin-bottom: 3rem;
+}
+.hero-breadcrumb span {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem;
+  font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+}
+.bc-parent { color: rgba(255,255,255,0.3); }
+.bc-sep { color: rgba(255,255,255,0.15); }
+.bc-current { color: var(--accent); }
+
+.capability-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.4rem 1rem; border: 1px solid rgba(200,169,110,0.3);
+  margin-bottom: 2rem; width: fit-content;
+}
+.badge-dot {
+  width: 6px; height: 6px; background: var(--accent); border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+.capability-badge span {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem;
+  font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent);
+}
+
+.hero h1 {
+  font-size: clamp(3rem, 5vw, 5.5rem); color: var(--white);
+  text-transform: uppercase; margin-bottom: 1rem; line-height: 0.95;
+}
+.hero h1 em { display: block; font-style: italic; font-weight: 300; color: var(--accent); }
+.hero-subhead {
+  font-size: 1.1rem; font-weight: 300; color: rgba(255,255,255,0.5);
+  max-width: 440px; margin-bottom: 3rem; line-height: 1.65; font-style: italic;
+}
+
+.hero-metrics {
+  display: flex; gap: 2.5rem; margin-bottom: 3rem;
+  padding-top: 2rem; border-top: 1px solid var(--border); flex-wrap: wrap;
+}
+.hero-metric .hm-num {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 2.2rem;
+  font-weight: 800; color: var(--accent); line-height: 1;
+}
+.hero-metric .hm-label {
+  font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em;
+  text-transform: uppercase; color: rgba(255,255,255,0.3); margin-top: 0.3rem;
+}
+.hero-actions { display: flex; gap: 1rem; }
+
+/* Hero right: abstract camera vision frame */
+.hero-right {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 5rem 4rem;
+}
+
+.vision-frame {
+  position: relative;
+  width: 100%; max-width: 460px;
+}
+
+/* Camera viewport box */
+.vf-viewport {
+  position: relative;
+  aspect-ratio: 4/3;
+  border: 1px solid rgba(200,169,110,0.2);
+  background: rgba(255,255,255,0.02);
+  overflow: hidden;
+}
+
+/* Corner brackets */
+.vf-viewport::before,
+.vf-viewport::after {
+  content: '';
+  position: absolute;
+  width: 24px; height: 24px;
+  border-color: var(--accent);
+  border-style: solid;
+  z-index: 3;
+}
+.vf-viewport::before {
+  top: 12px; left: 12px;
+  border-width: 2px 0 0 2px;
+}
+.vf-viewport::after {
+  bottom: 12px; right: 12px;
+  border-width: 0 2px 2px 0;
+}
+
+/* Additional corners via pseudo on inner div */
+.vf-corners::before,
+.vf-corners::after {
+  content: '';
+  position: absolute;
+  width: 24px; height: 24px;
+  border-color: var(--accent);
+  border-style: solid;
+  z-index: 3;
+}
+.vf-corners::before { top: 12px; right: 12px; border-width: 2px 2px 0 0; }
+.vf-corners::after { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; }
+.vf-corners { position: absolute; inset: 0; pointer-events: none; }
+
+/* Scanning line animation */
+.vf-scan {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(to right, transparent 0%, rgba(200,169,110,0.6) 50%, transparent 100%);
+  animation: scan-sweep 3s ease-in-out infinite;
+  z-index: 2;
+}
+@keyframes scan-sweep {
+  0% { top: 10%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 90%; opacity: 0; }
+}
+
+/* Grid overlay */
+.vf-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(200,169,110,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,169,110,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 1;
+}
+
+/* Product items on conveyor */
+.vf-products {
+  position: absolute;
+  bottom: 28%; left: 0; right: 0;
+  height: 60px;
+  z-index: 2;
+  display: flex; align-items: center;
+}
+
+.vf-conveyor-line {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(to right, transparent, rgba(200,169,110,0.3) 20%, rgba(200,169,110,0.3) 80%, transparent);
+}
+
+.vf-product {
+  position: absolute;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.55rem; font-weight: 700;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.1em;
+  animation: conveyor-move 8s linear infinite;
+}
+
+.vf-product.good {
+  background: rgba(100,200,150,0.12);
+  border: 1px solid rgba(100,200,150,0.4);
+  color: rgba(100,200,150,0.8);
+}
+.vf-product.ng {
+  background: rgba(220,80,80,0.12);
+  border: 1px solid rgba(220,80,80,0.4);
+  color: rgba(220,80,80,0.8);
+}
+.vf-product:nth-child(1) { left: 10%; animation-delay: 0s; }
+.vf-product:nth-child(2) { left: 30%; animation-delay: -2s; }
+.vf-product:nth-child(3) { left: 55%; animation-delay: -4s; }
+.vf-product:nth-child(4) { left: 75%; animation-delay: -6s; }
+
+@keyframes conveyor-move {
+  0% { transform: translateX(0); opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateX(200px); opacity: 0; }
+}
+
+/* Detection box on NG product */
+.vf-detect-box {
+  position: absolute;
+  left: 25%; top: 35%;
+  width: 50px; height: 50px;
+  border: 1.5px solid rgba(220,80,80,0.7);
+  animation: detect-pulse 2s ease-in-out infinite;
+  z-index: 4;
+}
+@keyframes detect-pulse {
+  0%, 100% { border-color: rgba(220,80,80,0.3); box-shadow: none; }
+  50% { border-color: rgba(220,80,80,0.9); box-shadow: 0 0 12px rgba(220,80,80,0.3); }
+}
+
+.vf-detect-label {
+  position: absolute;
+  top: -18px; left: 0;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(220,80,80,0.8);
+  background: rgba(10,10,10,0.8);
+  padding: 0.1rem 0.4rem;
+  white-space: nowrap;
+}
+
+/* Confidence readout */
+.vf-readout {
+  position: absolute;
+  top: 16px; right: 16px;
+  z-index: 5;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.vf-readout-item {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(10,10,10,0.7);
+  padding: 3px 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.6rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.vf-readout-item.ok { color: rgba(100,200,150,0.8); }
+.vf-readout-item.ng { color: rgba(220,80,80,0.8); }
+.vf-readout-dot { width: 5px; height: 5px; border-radius: 50%; }
+.ok .vf-readout-dot { background: rgba(100,200,150,0.8); }
+.ng .vf-readout-dot { background: rgba(220,80,80,0.8); }
+
+/* Camera label bar */
+.vf-label-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.6rem 1rem;
+  border: 1px solid rgba(200,169,110,0.15); border-top: none;
+  background: rgba(255,255,255,0.02);
+}
+.vf-label-bar-left {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.6rem;
+  font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(200,169,110,0.5);
+}
+.vf-status {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.6rem;
+  font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(100,200,150,0.7);
+}
+.vf-status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(100,200,150,0.7);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════
+   HOW VISION WORKS
+═══════════════════════════════════════ */
+.vision-arch-section {
+  background: var(--section-light);
+  padding: 8rem 6rem;
+}
+
+.split-header {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+  align-items: end; margin-bottom: 5rem;
+}
+.split-header h2 { font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase; line-height: 1; color: var(--black); }
+.split-header p { font-size: 1rem; color: var(--muted); max-width: 420px; }
+
+.arch-layout {
+  display: grid; grid-template-columns: 1.2fr 1fr; gap: 5rem; align-items: start;
+}
+
+/* Architecture flow visual */
+.arch-image-wrap {
+  position: relative;
+}
+.arch-image-wrap::before {
+  content: '';
+  position: absolute; inset: -1.5rem;
+  border: 1px solid #d8d5ce; pointer-events: none;
+}
+.arch-image-wrap img { width: 100%; display: block; }
+.arch-image-caption {
+  padding: 0.8rem 1rem; background: var(--white);
+  border: 1px solid #e0ddd8; border-top: none;
+  font-size: 0.65rem; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #aaa;
+}
+
+/* Architecture steps list */
+.arch-steps { display: flex; flex-direction: column; gap: 0; }
+.arch-step {
+  display: grid; grid-template-columns: 44px 1fr;
+  gap: 1.25rem; align-items: flex-start;
+  padding: 1.5rem 0; border-top: 1px solid #e0ddd8;
+  cursor: default; transition: padding-left 0.3s;
+}
+.arch-step:last-child { border-bottom: 1px solid #e0ddd8; }
+.arch-step:hover { padding-left: 0.5rem; }
+.arch-step-icon {
+  width: 44px; height: 44px; border: 1px solid #c8c5be;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: background 0.3s, border-color 0.3s;
+}
+.arch-step:hover .arch-step-icon {
+  background: rgba(200,169,110,0.12); border-color: var(--accent-dark);
+}
+.arch-step-icon i { font-size: 1rem; color: var(--accent-dark); }
+.arch-step-body h4 {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--black); margin-bottom: 0.35rem;
+}
+.arch-step-body p { font-size: 0.875rem; color: var(--muted); line-height: 1.65; }
+
+/* ═══════════════════════════════════════
+   HEATMAP / DEFECT SEVERITY
+═══════════════════════════════════════ */
+.heatmap-section {
+  background: var(--ink);
+  padding: 8rem 6rem;
+}
+
+.heatmap-layout {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+}
+
+.heatmap-text .label { display: block; margin-bottom: 1rem; }
+.heatmap-text h2 {
+  font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase;
+  color: var(--white); margin-bottom: 1.5rem; line-height: 1;
+}
+.heatmap-text > p { color: rgba(255,255,255,0.45); margin-bottom: 3rem; }
+
+.severity-scale {
+  margin-bottom: 2.5rem;
+}
+.severity-scale h5 {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.25);
+  margin-bottom: 0.75rem;
+}
+.severity-bar {
+  height: 10px;
+  background: linear-gradient(to right, #1a3a8c, #2563eb, #0ea5e9, #34d399, #fbbf24, #f97316, #dc2626);
+  border-radius: 1px;
+  margin-bottom: 0.5rem;
+}
+.severity-labels {
+  display: flex; justify-content: space-between;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.6rem;
+  font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.severity-labels span:first-child { color: #60a5fa; }
+.severity-labels span:last-child { color: #f87171; }
+.severity-labels span:nth-child(2) { color: rgba(255,255,255,0.3); }
+
+.heatmap-features { display: flex; flex-direction: column; gap: 0; }
+.heatmap-feature {
+  display: flex; gap: 1.25rem; align-items: flex-start;
+  padding: 1.25rem 0; border-top: 1px solid var(--border);
+  transition: padding-left 0.3s; cursor: default;
+}
+.heatmap-feature:last-child { border-bottom: 1px solid var(--border); }
+.heatmap-feature:hover { padding-left: 0.5rem; }
+.hf-icon {
+  width: 36px; height: 36px; border: 1px solid rgba(200,169,110,0.25);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: background 0.3s;
+}
+.heatmap-feature:hover .hf-icon { background: rgba(200,169,110,0.1); }
+.hf-icon i { font-size: 0.8rem; color: var(--accent); }
+.hf-body h4 {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--white); margin-bottom: 0.3rem;
+}
+.hf-body p { font-size: 0.85rem; color: rgba(255,255,255,0.35); line-height: 1.6; }
+
+.heatmap-image-col { position: relative; }
+.heatmap-image-col::before {
+  content: ''; position: absolute; inset: -1.5rem;
+  border: 1px solid rgba(200,169,110,0.1); pointer-events: none;
+}
+.heatmap-image-col img { width: 100%; display: block; }
+.heatmap-image-col .img-caption {
+  margin-top: 1rem; font-size: 0.65rem; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,255,255,0.2); text-align: center;
+}
+
+/* ═══════════════════════════════════════
+   ABSTRACT DIVIDER
+═══════════════════════════════════════ */
+.abstract-divider {
+  background: var(--black); padding: 5rem 6rem;
+  display: flex; align-items: center; gap: 3rem; overflow: hidden; position: relative;
+}
+.abstract-divider::after {
+  content: 'PERFECT VISION';
+  position: absolute; right: 3rem;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 8rem; font-weight: 800;
+  color: rgba(200,169,110,0.04); text-transform: uppercase;
+  letter-spacing: -0.02em; white-space: nowrap; pointer-events: none;
+}
+.divider-line { flex: 1; height: 1px; background: linear-gradient(to right, var(--accent), transparent); }
+.divider-quote blockquote {
+  font-family: 'Barlow Condensed', sans-serif; font-size: clamp(1.5rem,2.5vw,2.5rem);
+  font-weight: 600; font-style: italic; color: var(--white); text-transform: uppercase; line-height: 1.1;
+  max-width: 520px;
+}
+.divider-quote blockquote em { color: var(--accent); font-style: normal; }
+
+/* ═══════════════════════════════════════
+   HOW DETECTION WORKS (3 stages)
+═══════════════════════════════════════ */
+.detection-flow-section {
+  background: var(--section-light);
+  padding: 8rem 6rem;
+}
+.detection-flow-section h2 {
+  font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase;
+  color: var(--black); margin-bottom: 1rem; line-height: 1;
+}
+.detection-flow-intro { color: var(--muted); max-width: 540px; margin-bottom: 5rem; }
+
+.detection-steps {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0; border: 1px solid #d8d5ce; margin-bottom: 4rem;
+}
+.det-step {
+  padding: 3rem 2.5rem; border-right: 1px solid #d8d5ce;
+  position: relative; transition: background 0.3s; cursor: default;
+}
+.det-step:last-child { border-right: none; }
+.det-step:hover { background: var(--cream); }
+.det-step::after {
+  content: '\f054';
+  font-family: 'Font Awesome 6 Free'; font-weight: 900;
+  position: absolute; right: -11px; top: 50%; transform: translateY(-50%);
+  font-size: 0.7rem; color: var(--accent-dark); z-index: 2;
+}
+.det-step:last-child::after { display: none; }
+.det-step-num {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-dark); margin-bottom: 1rem;
+}
+.det-step-icon {
+  width: 52px; height: 52px; border: 1px solid #c8c5be;
+  display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;
+  transition: background 0.3s, border-color 0.3s;
+}
+.det-step:hover .det-step-icon { background: rgba(200,169,110,0.15); border-color: var(--accent-dark); }
+.det-step-icon i { font-size: 1.3rem; color: var(--accent-dark); }
+.det-step h3 {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 1.15rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--black); margin-bottom: 0.75rem;
+}
+.det-step p { font-size: 0.875rem; color: var(--muted); line-height: 1.65; }
+.det-step-tag {
+  display: inline-block; margin-top: 1.5rem;
+  padding: 0.25rem 0.7rem; border: 1px solid #c8c5be;
+  font-size: 0.6rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--accent-dark);
+}
+
+/* ═══════════════════════════════════════
+   USE CASES
+═══════════════════════════════════════ */
+.cases-section {
+  background: var(--black);
+  padding: 8rem 6rem;
+}
+.cases-section h2 {
+  font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase;
+  color: var(--white); margin-bottom: 1rem; line-height: 1;
+}
+.cases-intro { color: rgba(255,255,255,0.35); max-width: 500px; margin-bottom: 5rem; }
+
+.cases-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 0; border: 1px solid var(--border);
+}
+.case-card {
+  padding: 3rem;
+  border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  transition: background 0.3s; cursor: default;
+}
+.case-card:nth-child(2n) { border-right: none; }
+.case-card:nth-last-child(-n+2) { border-bottom: none; }
+.case-card:hover { background: rgba(200,169,110,0.04); }
+
+.case-industry-row {
+  display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem;
+}
+.ci-icon {
+  width: 40px; height: 40px; border: 1px solid rgba(200,169,110,0.2);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.3s;
+}
+.case-card:hover .ci-icon { background: rgba(200,169,110,0.1); }
+.ci-icon i { font-size: 0.9rem; color: var(--accent); }
+.ci-name {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent);
+}
+
+.case-card h3 {
+  font-size: 1.35rem; text-transform: uppercase; color: var(--white);
+  margin-bottom: 1rem; line-height: 1.1;
+}
+.case-card .case-desc { font-size: 0.9rem; color: rgba(255,255,255,0.4); margin-bottom: 2rem; line-height: 1.7; }
+
+.scenario-box {
+  background: rgba(255,255,255,0.03); padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem; border-left: 3px solid var(--accent); position: relative;
+}
+.scenario-box::before {
+  content: 'SCENARIO'; position: absolute; top: -0.6rem; left: 1.5rem;
+  background: var(--black); padding: 0 0.5rem;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.6rem; font-weight: 600;
+  letter-spacing: 0.2em; color: var(--accent);
+}
+.case-card:hover .scenario-box { background: rgba(200,169,110,0.05); }
+.scenario-box p { font-size: 0.85rem; color: rgba(255,255,255,0.5); font-style: italic; line-height: 1.65; }
+
+.case-result {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.75rem 0; border-top: 1px solid var(--border);
+}
+.case-result:first-of-type { margin-top: 0.5rem; }
+.case-result i { font-size: 0.65rem; color: var(--accent); flex-shrink: 0; }
+.case-result span { font-size: 0.85rem; color: rgba(255,255,255,0.45); }
+.case-result strong { color: var(--accent); font-family: 'Barlow Condensed', sans-serif; font-size: 1.1rem; font-weight: 700; }
+
+/* ═══════════════════════════════════════
+   BENEFITS
+═══════════════════════════════════════ */
+.benefits-section {
+  background: var(--section-light);
+  padding: 8rem 6rem;
+}
+.benefits-section h2 {
+  font-size: clamp(2.5rem,3.5vw,4rem); text-transform: uppercase;
+  color: var(--black); margin-bottom: 1rem; line-height: 1;
+}
+.benefits-intro { color: var(--muted); max-width: 500px; margin-bottom: 5rem; }
+
+.benefits-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 0; border: 1px solid #d8d5ce; margin-bottom: 4rem;
+}
+.benefit-card {
+  padding: 3rem 2.5rem; border-right: 1px solid #d8d5ce;
+  position: relative; overflow: hidden; transition: background 0.3s; cursor: default;
+}
+.benefit-card:last-child { border-right: none; }
+.benefit-card::after {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 3px; height: 0; background: var(--accent-dark); transition: height 0.4s ease;
+}
+.benefit-card:hover { background: var(--cream); }
+.benefit-card:hover::after { height: 100%; }
+
+.benefit-num {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 3rem; font-weight: 800;
+  color: var(--accent-dark); line-height: 1; margin-bottom: 0.5rem;
+}
+.benefit-card h4 {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--black); margin-bottom: 0.75rem;
+}
+.benefit-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+.benefit-bg {
+  position: absolute; top: 1rem; right: 1rem;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 4.5rem; font-weight: 800;
+  color: rgba(0,0,0,0.04); line-height: 1; pointer-events: none;
+}
+
+/* Manual vs AI comparison */
+.compare-block {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+  border: 1px solid #d8d5ce; overflow: hidden;
+}
+.compare-col { padding: 3rem; }
+.compare-col.manual { border-right: 1px solid #d8d5ce; background: var(--white); }
+.compare-col.ai { background: var(--black); }
+
+.cmp-tag {
+  display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;
+}
+.cmp-tag i { font-size: 0.65rem; }
+.cmp-tag span {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+}
+.compare-col.manual .cmp-tag i,
+.compare-col.manual .cmp-tag span { color: #aaa; }
+.compare-col.ai .cmp-tag i,
+.compare-col.ai .cmp-tag span { color: var(--accent); }
+
+.compare-col h3 { font-size: 1.6rem; text-transform: uppercase; margin-bottom: 1.5rem; }
+.compare-col.manual h3 { color: var(--black); }
+.compare-col.ai h3 { color: var(--white); }
+
+.cmp-list { list-style: none; }
+.cmp-list li {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  padding: 0.65rem 0; border-top: 1px solid;
+  font-size: 0.875rem;
+}
+.compare-col.manual .cmp-list li { border-color: #eeebe4; color: var(--muted); }
+.compare-col.manual .cmp-list li i { color: #c0bdb8; font-size: 0.7rem; margin-top: 4px; flex-shrink: 0; }
+.compare-col.ai .cmp-list li { border-color: var(--border); color: rgba(255,255,255,0.5); }
+.compare-col.ai .cmp-list li i { color: var(--accent); font-size: 0.7rem; margin-top: 4px; flex-shrink: 0; }
+
+/* ═══════════════════════════════════════
+   MANIFESTO + CTA
+═══════════════════════════════════════ */
+.manifesto-strip {
+  background: var(--accent); padding: 4rem 6rem;
+  display: grid; grid-template-columns: 1fr auto; gap: 4rem; align-items: center;
+}
+.manifesto-strip h2 {
+  font-size: clamp(1.8rem,3vw,3rem); text-transform: uppercase;
+  color: var(--black); max-width: 750px;
+}
+.manifesto-strip h2 em { font-style: normal; text-decoration: underline; text-underline-offset: 6px; }
+
+.cta-section {
+  background: var(--charcoal); padding: 7rem 6rem;
+  display: grid; grid-template-columns: 1fr auto; gap: 4rem; align-items: center;
+}
+.cta-section h2 {
+  font-size: clamp(2rem,3.5vw,3.5rem); color: var(--white); text-transform: uppercase; max-width: 650px;
+}
+.cta-section h2 em { font-style: italic; font-weight: 300; color: var(--accent); }
+.cta-actions { display: flex; flex-direction: column; gap: 1rem; min-width: 200px; }
+.btn-whatsapp {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+  padding: 1rem 2rem; background: #25D366; color: var(--white);
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; transition: background 0.2s;
+}
+.btn-whatsapp:hover { background: #1ab555; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1100px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-left { padding: 5rem 3rem 3rem; }
+  .hero-right { padding: 3rem 3rem 5rem; }
+  .vision-arch-section, .heatmap-section, .detection-flow-section,
+  .cases-section, .benefits-section { padding: 6rem 3rem; }
+  .manifesto-strip, .cta-section { padding: 5rem 3rem; }
+  .arch-layout, .heatmap-layout { grid-template-columns: 1fr; gap: 3rem; }
+  .benefits-grid { grid-template-columns: repeat(2,1fr); }
+  .benefit-card:nth-child(2n) { border-right: none; }
+  .benefit-card:nth-child(1), .benefit-card:nth-child(2) { border-bottom: 1px solid #d8d5ce; }
+}
+@media (max-width: 900px) {
+  nav { padding: 0 1.5rem; }
+  .hero-left { padding: 4rem 2rem 2rem; }
+  .hero-right { display: none; }
+  .split-header { grid-template-columns: 1fr; gap: 1.5rem; }
+  .detection-steps { grid-template-columns: 1fr; }
+  .det-step { border-right: none; border-bottom: 1px solid #d8d5ce; }
+  .det-step::after { display: none; }
+  .det-step:last-child { border-bottom: none; }
+  .cases-grid { grid-template-columns: 1fr; }
+  .case-card { border-right: none; }
+  .case-card:nth-last-child(-n+2) { border-bottom: 1px solid var(--border); }
+  .case-card:last-child { border-bottom: none; }
+  .compare-block { grid-template-columns: 1fr; }
+  .compare-col.manual { border-right: none; border-bottom: 1px solid #d8d5ce; }
+  .manifesto-strip, .cta-section { grid-template-columns: 1fr; gap: 2rem; }
+  .vision-arch-section, .heatmap-section, .detection-flow-section,
+  .cases-section, .benefits-section { padding: 5rem 2rem; }
+  .manifesto-strip, .cta-section { padding: 4rem 2rem; }
+}
+@media (max-width: 600px) {
+  .hero-left { padding: 4rem 1.5rem 3rem; }
+  .hero-actions { flex-direction: column; }
+  .benefits-grid { grid-template-columns: 1fr; }
+  .benefit-card { border-right: none; border-bottom: 1px solid #d8d5ce; }
+  .benefit-card:last-child { border-bottom: none; }
+  .abstract-divider { padding: 3rem 1.5rem; }
+  .vision-arch-section, .heatmap-section, .detection-flow-section,
+  .cases-section, .benefits-section { padding: 4rem 1.5rem; }
+  .manifesto-strip, .cta-section { padding: 3rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <span class="nav-logo-text">Zero Eleven</span>
+  </a>
+  <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Home</a>
+  <a href="https://api.whatsapp.com/send?phone=6281243953947" target="_blank" class="nav-cta-btn">
+    <i class="fab fa-whatsapp"></i> Talk to Us
+  </a>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     HERO
+═══════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-breadcrumb">
+      <span class="bc-parent">Capabilities</span>
+      <span class="bc-sep">/</span>
+      <span class="bc-current">03</span>
+    </div>
+
+    <div class="capability-badge">
+      <div class="badge-dot"></div>
+      <span>Visual Intelligence Systems</span>
+    </div>
+
+    <h1>
+      Perfect<br>
+      Vision,<br>
+      <em>Every Time</em>
+    </h1>
+
+    <p class="hero-subhead">"Computer vision that understands what it sees."</p>
+
+    <div class="hero-metrics">
+      <div class="hero-metric">
+        <div class="hm-num">99.8%</div>
+        <div class="hm-label">Detection Accuracy</div>
+      </div>
+      <div class="hero-metric">
+        <div class="hm-num">65%</div>
+        <div class="hm-label">Faster QC Cycle</div>
+      </div>
+      <div class="hero-metric">
+        <div class="hm-num">100%</div>
+        <div class="hm-label">Inspection Coverage</div>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a href="#how-it-works" class="btn-primary">How It Works <i class="fas fa-arrow-down"></i></a>
+      <a href="#cases" class="btn-ghost">See Use Cases</a>
+    </div>
+  </div>
+
+  <!-- Hero Right: Live Camera Vision Abstract -->
+  <div class="hero-right">
+    <div class="vision-frame">
+      <div class="vf-viewport">
+        <div class="vf-corners"></div>
+        <div class="vf-grid"></div>
+        <div class="vf-scan"></div>
+
+        <!-- Products on conveyor -->
+        <div class="vf-products">
+          <div class="vf-conveyor-line"></div>
+          <div class="vf-product good">OK</div>
+          <div class="vf-product ng">NG</div>
+          <div class="vf-product good">OK</div>
+          <div class="vf-product good">OK</div>
+        </div>
+
+        <!-- Detection box on defective item -->
+        <div class="vf-detect-box">
+          <div class="vf-detect-label">DEFECT · 94.2%</div>
+        </div>
+
+        <!-- Top-right readout -->
+        <div class="vf-readout">
+          <div class="vf-readout-item ok">
+            <div class="vf-readout-dot"></div> PASS · 3
+          </div>
+          <div class="vf-readout-item ng">
+            <div class="vf-readout-dot"></div> FAIL · 1
+          </div>
+        </div>
+      </div>
+      <div class="vf-label-bar">
+        <span class="vf-label-bar-left">
+          <i class="fas fa-video" style="margin-right:0.4rem;font-size:0.6rem"></i>
+          Camera A · Line 03 · 120fps
+        </span>
+        <span class="vf-status">
+          <div class="vf-status-dot"></div>
+          Live · Inference Active
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     VISION ARCHITECTURE
+═══════════════════════════════════════ -->
+<section class="vision-arch-section reveal" id="how-it-works">
+  <div class="split-header">
+    <div>
+      <span class="label" style="color:var(--accent-dark);display:block;margin-bottom:0.75rem">System Architecture</span>
+      <h2>From Camera<br>to Cloud Intelligence</h2>
+    </div>
+    <p>A closed-loop visual intelligence system — cameras capture every product, edge hardware infers in real time, and a cloud backbone stores, trains, and continuously improves the model.</p>
+  </div>
+
+  <div class="arch-layout">
+    <div class="arch-image-wrap reveal">
+      <img src="sources/defect-sorting.png" alt="ML-based defect detection and sorting: Camera → Edge Analytics → Cloud ML → Sorted/Defective Parts">
+      <div class="arch-image-caption">
+        <i class="fas fa-info-circle"></i> &nbsp;
+        Camera-Based Defect Detection & Automated Sorting Architecture
+      </div>
+    </div>
+
+    <div class="arch-steps reveal" style="transition-delay:0.12s">
+      <div class="arch-step">
+        <div class="arch-step-icon"><i class="fas fa-video"></i></div>
+        <div class="arch-step-body">
+          <h4>Camera Capture</h4>
+          <p>High-speed industrial cameras capture every unit at line speed — 100% coverage, no sampling. Multiple camera angles ensure no surface is missed.</p>
+        </div>
+      </div>
+      <div class="arch-step">
+        <div class="arch-step-icon"><i class="fas fa-microchip"></i></div>
+        <div class="arch-step-body">
+          <h4>Edge Analytic Platform</h4>
+          <p>On-premise inference hardware runs the detection model locally — sub-10ms decision latency. No cloud round-trip for production-line decisions.</p>
+        </div>
+      </div>
+      <div class="arch-step">
+        <div class="arch-step-icon"><i class="fas fa-robot"></i></div>
+        <div class="arch-step-body">
+          <h4>ML-Based Classification</h4>
+          <p>The model classifies each unit as Good (OK) or Not Good (NG), identifies the defect type, localizes it spatially, and scores its severity — all in a single inference pass.</p>
+        </div>
+      </div>
+      <div class="arch-step">
+        <div class="arch-step-icon"><i class="fas fa-sort-amount-down"></i></div>
+        <div class="arch-step-body">
+          <h4>Automated Sorting</h4>
+          <p>Defective units are physically sorted from the production flow by actuators triggered directly by the edge platform — before they reach packaging or downstream assembly.</p>
+        </div>
+      </div>
+      <div class="arch-step">
+        <div class="arch-step-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+        <div class="arch-step-body">
+          <h4>Cloud Training Loop</h4>
+          <p>Every detection event — pass or fail — is logged to cloud storage. New edge cases retrain the model on a rolling basis. The system becomes more accurate with every production run.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     HEATMAP / DEFECT SEVERITY
+═══════════════════════════════════════ -->
+<section class="heatmap-section reveal">
+  <div class="heatmap-layout">
+    <div class="heatmap-text">
+      <span class="label">Defect Analysis</span>
+      <h2>See Exactly<br>Where It Fails</h2>
+      <p>Beyond pass/fail binary. Our heatmap visualization maps defect intensity across the product surface — identifying not just the presence of damage, but its precise location, spread, and severity grade.</p>
+
+      <div class="severity-scale">
+        <h5>Defect Severity Spectrum</h5>
+        <div class="severity-bar"></div>
+        <div class="severity-labels">
+          <span>Trace</span>
+          <span>Moderate</span>
+          <span>Critical</span>
+        </div>
+      </div>
+
+      <div class="heatmap-features">
+        <div class="heatmap-feature">
+          <div class="hf-icon"><i class="fas fa-map-marked-alt"></i></div>
+          <div class="hf-body">
+            <h4>Spatial Localization</h4>
+            <p>Defects are pinpointed to sub-millimeter precision on the product surface — enabling targeted rework rather than full rejection of salvageable parts.</p>
+          </div>
+        </div>
+        <div class="heatmap-feature">
+          <div class="hf-icon"><i class="fas fa-thermometer-half"></i></div>
+          <div class="hf-body">
+            <h4>Severity Scoring</h4>
+            <p>Each detected anomaly is assigned a severity score from trace (cool tones) to critical (red). This drives tiered decisions: pass, rework, or scrap — automatically.</p>
+          </div>
+        </div>
+        <div class="heatmap-feature">
+          <div class="hf-icon"><i class="fas fa-layer-group"></i></div>
+          <div class="hf-body">
+            <h4>Multi-Defect Overlay</h4>
+            <p>Multiple defect types on a single product are captured simultaneously — surface cracks, contamination, dimensional deviations — layered in a single heatmap view.</p>
+          </div>
+        </div>
+        <div class="heatmap-feature">
+          <div class="hf-icon"><i class="fas fa-chart-bar"></i></div>
+          <div class="hf-body">
+            <h4>Production Quality Trending</h4>
+            <p>Aggregated heatmap data across batches reveals systemic quality drift — detecting process degradation before defect rates climb, enabling pre-emptive process correction.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="heatmap-image-col">
+      <img src="sources/heatmap-defect-detection.jpg" alt="Thermal heatmap defect detection on industrial components — bearing and mechanical part surface analysis">
+      <p class="img-caption">AI Heatmap Analysis · Surface Defect Severity Mapping on Industrial Components</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     ABSTRACT DIVIDER
+═══════════════════════════════════════ -->
+<div class="abstract-divider">
+  <div class="divider-line"></div>
+  <div class="divider-quote">
+    <blockquote>
+      "The human eye misses one defect<br>
+      in every thousand. The camera<br>
+      <em>never</em> does."
+    </blockquote>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     HOW DETECTION WORKS
+═══════════════════════════════════════ -->
+<section class="detection-flow-section reveal" id="detection">
+  <span class="label" style="color:var(--accent-dark);display:block;margin-bottom:1rem">The Intelligence Loop</span>
+  <h2>From Pixel<br>to Decision</h2>
+  <p class="detection-flow-intro">Three computational stages transform raw camera frames into actionable quality decisions — faster than any human inspector.</p>
+
+  <div class="detection-steps">
+    <div class="det-step reveal">
+      <div class="det-step-num">Stage 01</div>
+      <div class="det-step-icon"><i class="fas fa-image"></i></div>
+      <h3>Image Acquisition<br>& Preprocessing</h3>
+      <p>High-frame-rate cameras feed raw pixel data to the edge processor. Lighting normalization, lens distortion correction, and frame alignment are applied before inference — ensuring consistent inputs regardless of environmental variation.</p>
+      <span class="det-step-tag">120fps · Multi-angle</span>
+    </div>
+    <div class="det-step reveal" style="transition-delay:0.1s">
+      <div class="det-step-num">Stage 02</div>
+      <div class="det-step-icon"><i class="fas fa-brain"></i></div>
+      <h3>Deep Learning<br>Inference</h3>
+      <p>A convolutional neural network trained on thousands of product-specific defect samples runs inference on each frame. The model simultaneously classifies defect type, localizes it via bounding box, and scores severity through gradient-weighted heatmap generation.</p>
+      <span class="det-step-tag">CNN · &lt;10ms latency</span>
+    </div>
+    <div class="det-step reveal" style="transition-delay:0.2s">
+      <div class="det-step-num">Stage 03</div>
+      <div class="det-step-icon"><i class="fas fa-check-double"></i></div>
+      <h3>Decision &<br>Downstream Action</h3>
+      <p>The inference result triggers a real-time decision: sort the unit, flag for rework, or allow it to continue downstream. Result data is logged, annotated images are stored, and the production quality dashboard is updated — all within the same inference cycle.</p>
+      <span class="det-step-tag">Real-time · Auto-sort</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     USE CASES
+═══════════════════════════════════════ -->
+<section class="cases-section reveal" id="cases">
+  <span class="label" style="display:block;margin-bottom:1rem">Real-World Applications</span>
+  <h2>What the<br>Camera Sees</h2>
+  <p class="cases-intro">Four industries where human inspection is too slow, too inconsistent, or too expensive to scale — and where machine vision changes the outcome.</p>
+
+  <div class="cases-grid">
+
+    <!-- Electronics -->
+    <div class="case-card reveal">
+      <div class="case-industry-row">
+        <div class="ci-icon"><i class="fas fa-microchip"></i></div>
+        <span class="ci-name">Electronics</span>
+      </div>
+      <h3>PCB Assembly<br>Inspection</h3>
+      <p class="case-desc">Printed circuit boards contain hundreds of solder joints, components, and traces per unit. Missing components, solder bridges, and cold joints are invisible at line speed to any human inspector.</p>
+      <div class="scenario-box">
+        <p>A batch of 10,000 PCBs runs at 8 units/second. The vision system detects a cold solder joint on pin 14 of a capacitor — 0.4mm in diameter — across 34 units in the batch. All 34 are sorted before downstream assembly. Total inspection time: 21 minutes.</p>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-bullseye"></i>
+        <span><strong>99.8%</strong> solder defect detection rate — all defect types</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-tachometer-alt"></i>
+        <span><strong>65%</strong> faster cycle time vs. manual AXI inspection</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-ban"></i>
+        <span>Zero field failures from QC-passed units post-deployment</span>
+      </div>
+    </div>
+
+    <!-- Pharmaceutical -->
+    <div class="case-card reveal" style="transition-delay:0.1s">
+      <div class="case-industry-row">
+        <div class="ci-icon"><i class="fas fa-pills"></i></div>
+        <span class="ci-name">Pharmaceutical</span>
+      </div>
+      <h3>Label & Packaging<br>Integrity Inspection</h3>
+      <p class="case-desc">Pharmaceutical packaging carries regulatory and patient safety requirements that tolerate zero error — mislabeled doses, missing barcodes, or incorrect lot numbers carry severe consequences.</p>
+      <div class="scenario-box">
+        <p>A label printing machine experiences a 0.3mm misalignment drift mid-run. The vision system detects the barcode becoming unreadable after unit 1,840 — immediately halting the labeling station and alerting the operator before any non-compliant units reach the packaging line.</p>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-barcode"></i>
+        <span><strong>100%</strong> barcode readability and label placement verification</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-shield-alt"></i>
+        <span>Full <strong>GMP compliance</strong> documentation per production run</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-clock"></i>
+        <span>Drift detected within <strong>1 defective unit</strong> — not 1,000</span>
+      </div>
+    </div>
+
+    <!-- Automotive -->
+    <div class="case-card reveal" style="transition-delay:0.2s">
+      <div class="case-industry-row">
+        <div class="ci-icon"><i class="fas fa-car"></i></div>
+        <span class="ci-name">Automotive</span>
+      </div>
+      <h3>Paint Surface<br>Defect Detection</h3>
+      <p class="case-desc">Automotive OEMs apply 5–7 paint layers per body panel. Inclusions, runs, orange peel, and micro-scratches are near-invisible to the naked eye under standard lighting — but catastrophic to brand quality.</p>
+      <div class="scenario-box">
+        <p>A full vehicle body exits the paint booth. The multi-angle vision rig completes a 360° surface scan in 8 seconds — flagging 3 micro-inclusions on the hood, 1 orange-peel zone on the driver door, and a 2cm paint run on the rear quarter panel. All coordinates logged for targeted rework.</p>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-search-plus"></i>
+        <span>Detects defects from <strong>0.1mm</strong> — below human visual threshold</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-stopwatch"></i>
+        <span>Full body scan in <strong>8 seconds</strong> — vs. 45 min manual inspection</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-wrench"></i>
+        <span>Targeted rework coordinates — <strong>no full repaint</strong> required</span>
+      </div>
+    </div>
+
+    <!-- Food & Beverage -->
+    <div class="case-card reveal" style="transition-delay:0.3s">
+      <div class="case-industry-row">
+        <div class="ci-icon"><i class="fas fa-apple-alt"></i></div>
+        <span class="ci-name">Food & Beverage</span>
+      </div>
+      <h3>Product Quality<br>Grade Sorting</h3>
+      <p class="case-desc">Manual grading of food products is inconsistent, labor-intensive, and a hygiene risk. High-volume throughput lines cannot be staffed to inspect every individual unit.</p>
+      <div class="scenario-box">
+        <p>A fruit processing line runs at 12 tons/hour. The vision system grades each piece across 6 quality parameters — color, size, surface blemish, bruising, shape deviation, and foreign matter — sorting output into 4 quality tiers in real time. Zero contaminated units reach packaging.</p>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-layer-group"></i>
+        <span><strong>6-parameter</strong> simultaneous quality grading per unit</span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-random"></i>
+        <span>4-tier automatic grade sorting at <strong>12 tons/hour</strong></span>
+      </div>
+      <div class="case-result">
+        <i class="fas fa-leaf"></i>
+        <span><strong>Zero</strong> foreign matter or contaminated units passed to packaging</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     BENEFITS
+═══════════════════════════════════════ -->
+<section class="benefits-section reveal" id="benefits">
+  <span class="label" style="color:var(--accent-dark);display:block;margin-bottom:1rem">Measured Outcomes</span>
+  <h2>The Numbers<br>Behind the Vision</h2>
+  <p class="benefits-intro">Four metrics that define what Zero Eleven Visual Intelligence delivers — measured across production deployments, not simulations.</p>
+
+  <div class="benefits-grid">
+    <div class="benefit-card">
+      <div class="benefit-bg">01</div>
+      <div class="benefit-num">99.8%</div>
+      <h4>Detection Accuracy</h4>
+      <p>Near-perfect defect identification across all defect types — from sub-millimeter surface inclusions to dimensional deviations at line speed.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-bg">02</div>
+      <div class="benefit-num">65%</div>
+      <h4>Faster QC Cycle</h4>
+      <p>Inspection that previously required 45 minutes of manual review now completes in under 10 seconds. Throughput bottlenecks are eliminated entirely.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-bg">03</div>
+      <div class="benefit-num">Zero</div>
+      <h4>Missed Defects</h4>
+      <p>Post-deployment tracking across production runs shows zero missed defects passing through a calibrated Zero Eleven vision system to end customers.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-bg">04</div>
+      <div class="benefit-num">100%</div>
+      <h4>Inspection Coverage</h4>
+      <p>Every single unit inspected — not a statistical sample. No unit leaves the line without a complete pass/fail record attached to its production data.</p>
+    </div>
+  </div>
+
+  <!-- Manual vs AI Vision comparison -->
+  <div class="compare-block reveal">
+    <div class="compare-col manual">
+      <div class="cmp-tag">
+        <i class="fas fa-times-circle"></i>
+        <span>Manual Human Inspection</span>
+      </div>
+      <h3>Inconsistent,<br>Incomplete</h3>
+      <ul class="cmp-list">
+        <li><i class="fas fa-minus"></i> Statistical sampling only — typically 1–5% of production volume</li>
+        <li><i class="fas fa-minus"></i> Inspector fatigue degrades accuracy over the shift</li>
+        <li><i class="fas fa-minus"></i> Inconsistent standards between inspectors and shifts</li>
+        <li><i class="fas fa-minus"></i> Sub-millimeter defects invisible to the naked eye</li>
+        <li><i class="fas fa-minus"></i> No spatial localization — unit rejected entirely, no rework</li>
+        <li><i class="fas fa-minus"></i> No systematic defect data — quality trends invisible</li>
+        <li><i class="fas fa-minus"></i> High labor cost, hygiene risk, and operational bottleneck</li>
+      </ul>
+    </div>
+    <div class="compare-col ai">
+      <div class="cmp-tag">
+        <i class="fas fa-check-circle"></i>
+        <span>Zero Eleven Visual Intelligence</span>
+      </div>
+      <h3>Precise,<br>Tireless</h3>
+      <ul class="cmp-list">
+        <li><i class="fas fa-check"></i> 100% inspection of every unit at full line speed</li>
+        <li><i class="fas fa-check"></i> Consistent accuracy — same standard at 6am and midnight, day 1 and year 3</li>
+        <li><i class="fas fa-check"></i> Objective, model-defined defect classification — no inspector variation</li>
+        <li><i class="fas fa-check"></i> 0.1mm defect detection threshold with heatmap severity scoring</li>
+        <li><i class="fas fa-check"></i> Spatial coordinates provided — targeted rework saves material cost</li>
+        <li><i class="fas fa-check"></i> Full quality dataset per production run — trend analysis and continuous improvement</li>
+        <li><i class="fas fa-check"></i> Autonomous, 24/7 operation — zero added headcount required</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     MANIFESTO STRIP
+═══════════════════════════════════════ -->
+<div class="manifesto-strip">
+  <h2>
+    A machine that inspects <em>100%</em> of your production,<br>
+    never fatigues, never misses a defect,<br>
+    and gets <em>better</em> with every production run.
+  </h2>
+  <a href="https://api.whatsapp.com/send?phone=6281243953947" target="_blank" class="btn-primary" style="background:var(--black);color:var(--white);white-space:nowrap">
+    Deploy Vision AI <i class="fas fa-arrow-right"></i>
+  </a>
+</div>
+
+<!-- ═══════════════════════════════════════
+     CTA
+═══════════════════════════════════════ -->
+<div class="cta-section" id="contact">
+  <h2>Ready for<br><em>Perfect Vision</em><br>on Your Line?</h2>
+  <div class="cta-actions">
+    <a href="https://api.whatsapp.com/send?phone=6281243953947" target="_blank" class="btn-whatsapp">
+      <i class="fab fa-whatsapp"></i> Start a Conversation
+    </a>
+    <a href="index.html#process" class="btn-ghost" style="border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);justify-content:center">
+      See Our Process
+    </a>
+  </div>
+</div>
+
+<script>
+// Scroll Reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+</script>
+</body>
+</html>

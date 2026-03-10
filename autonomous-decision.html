@@ -1,0 +1,1957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autonomous Decision Intelligence — Zero Eleven</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=Barlow+Condensed:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black: #0a0a0a;
+  --charcoal: #141414;
+  --ink: #1e1e1e;
+  --steel: #2a2a2a;
+  --mid: #555;
+  --muted: #888;
+  --border: rgba(255,255,255,0.08);
+  --white: #ffffff;
+  --off-white: #f4f4f2;
+  --cream: #ede9e1;
+  --accent: #c8a96e;
+  --accent-dark: #a8893e;
+  --accent-light: #e8c98e;
+  --section-light: #f7f5f0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--white);
+  color: var(--black);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── TYPOGRAPHY ─── */
+.label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+h1, h2, h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+p { font-weight: 300; line-height: 1.7; color: var(--mid); }
+
+/* ─── NAV ─── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  padding: 0 3rem;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(10,10,10,0.96);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+}
+
+.nav-logo-text {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--white);
+  text-transform: uppercase;
+}
+
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav-back:hover { color: var(--accent); }
+
+.nav-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.4rem;
+  background: var(--accent);
+  color: var(--black);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.nav-cta-btn:hover { background: var(--accent-light); }
+
+/* ─── HERO ─── */
+.hero {
+  padding-top: 72px;
+  min-height: 100vh;
+  background: var(--black);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated grid background */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(200,169,110,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,169,110,0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  animation: grid-shift 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes grid-shift {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(80px); }
+}
+
+.hero-left {
+  position: relative;
+  z-index: 2;
+  padding: 5rem 4rem 5rem 6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 3rem;
+}
+
+.hero-breadcrumb span {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.hero-breadcrumb .bc-parent { color: rgba(255,255,255,0.3); }
+.hero-breadcrumb .bc-sep { color: rgba(255,255,255,0.15); }
+.hero-breadcrumb .bc-current { color: var(--accent); }
+
+.capability-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  border: 1px solid rgba(200,169,110,0.3);
+  margin-bottom: 2rem;
+  width: fit-content;
+}
+
+.capability-badge .badge-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+.capability-badge span {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.hero h1 {
+  font-size: clamp(3rem, 5vw, 5.5rem);
+  color: var(--white);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  line-height: 0.95;
+}
+
+.hero h1 em {
+  display: block;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--accent);
+}
+
+.hero-subhead {
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.5);
+  max-width: 420px;
+  margin-bottom: 3rem;
+  line-height: 1.65;
+  font-style: italic;
+}
+
+.hero-metrics {
+  display: flex;
+  gap: 2.5rem;
+  margin-bottom: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.hero-metric .hm-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.hero-metric .hm-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-top: 0.3rem;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 2rem;
+  background: var(--accent);
+  color: var(--black);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.btn-primary:hover { background: var(--accent-light); transform: translateY(-2px); }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 2rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.7);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+.hero-right {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 5rem 4rem;
+}
+
+/* ─── ABSTRACT INTELLIGENCE VISUAL ─── */
+.intel-visual {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.intel-core {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px; height: 120px;
+  border: 2px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+  background: rgba(200,169,110,0.08);
+}
+
+.intel-core-inner {
+  width: 70px; height: 70px;
+  background: rgba(200,169,110,0.15);
+  border: 1px solid rgba(200,169,110,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.intel-core-inner i {
+  font-size: 1.5rem;
+  color: var(--accent);
+}
+
+.intel-ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(200,169,110,0.15);
+  border-radius: 50%;
+}
+
+.intel-ring:nth-child(1) {
+  width: 200px; height: 200px;
+  animation: ring-spin 12s linear infinite;
+}
+
+.intel-ring:nth-child(2) {
+  width: 290px; height: 290px;
+  animation: ring-spin 18s linear infinite reverse;
+}
+
+.intel-ring:nth-child(3) {
+  width: 380px; height: 380px;
+  animation: ring-spin 24s linear infinite;
+}
+
+@keyframes ring-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Nodes on rings */
+.ring-node {
+  position: absolute;
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(200,169,110,0.8);
+}
+
+.node-label {
+  position: absolute;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(200,169,110,0.7);
+  white-space: nowrap;
+}
+
+/* Connection lines from center */
+.connection-line {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 1px;
+  background: linear-gradient(to bottom, rgba(200,169,110,0.4), transparent);
+  transform-origin: top center;
+  opacity: 0.5;
+}
+
+/* ─── PROBLEM FRAMING ─── */
+.section { padding: 8rem 6rem; }
+.section-sm { padding: 5rem 6rem; }
+.section-dark { background: var(--charcoal); }
+.section-ink { background: var(--ink); }
+.section-light { background: var(--section-light); }
+
+/* ─── DECISION COMPARISON ─── */
+.decision-section {
+  background: var(--section-light);
+  padding: 8rem 6rem;
+}
+
+.section-header-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: end;
+  margin-bottom: 5rem;
+}
+
+.section-header-split h2 {
+  font-size: clamp(2.5rem, 3.5vw, 4rem);
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--black);
+}
+
+.section-header-split p {
+  font-size: 1rem;
+  color: var(--muted);
+  max-width: 400px;
+}
+
+.comparison-block {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid #d8d5ce;
+  overflow: hidden;
+}
+
+.comparison-col {
+  padding: 3.5rem;
+  position: relative;
+}
+
+.comparison-col.traditional {
+  background: var(--white);
+  border-right: 1px solid #d8d5ce;
+}
+
+.comparison-col.intelligent {
+  background: var(--black);
+}
+
+.comp-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.comp-tag i {
+  font-size: 0.65rem;
+}
+
+.comp-tag.trad i { color: #999; }
+.comp-tag.intel i { color: var(--accent); }
+
+.comp-tag span {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.comp-tag.trad span { color: #999; }
+.comp-tag.intel span { color: var(--accent); }
+
+.comparison-col h3 {
+  font-size: 1.6rem;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.comparison-col.traditional h3 { color: var(--black); }
+.comparison-col.intelligent h3 { color: var(--white); }
+
+.comparison-col p {
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+}
+
+.comparison-col.traditional p { color: var(--muted); }
+.comparison-col.intelligent p { color: rgba(255,255,255,0.45); }
+
+.comp-list {
+  list-style: none;
+}
+
+.comp-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.7rem 0;
+  border-top: 1px solid;
+  font-size: 0.875rem;
+}
+
+.comparison-col.traditional .comp-list li { border-color: #eeebe4; color: var(--muted); }
+.comparison-col.intelligent .comp-list li { border-color: var(--border); color: rgba(255,255,255,0.5); }
+
+.comp-list li i {
+  font-size: 0.7rem;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.comparison-col.traditional .comp-list li i { color: #bbb; }
+.comparison-col.intelligent .comp-list li i { color: var(--accent); }
+
+.comp-image-wrap {
+  width: 100%;
+  margin-top: 2.5rem;
+  border: 1px solid;
+  overflow: hidden;
+}
+
+.comparison-col.traditional .comp-image-wrap { border-color: #e0ddd8; }
+.comparison-col.intelligent .comp-image-wrap { border-color: rgba(200,169,110,0.2); }
+
+.comp-image-wrap img {
+  width: 100%;
+  display: block;
+}
+
+.comparison-col.intelligent .comp-image-wrap img {
+  filter: invert(1) hue-rotate(180deg) saturate(0.3) brightness(0.7);
+}
+
+/* ─── HOW IT WORKS ─── */
+.how-section {
+  background: var(--ink);
+  padding: 8rem 6rem;
+}
+
+.how-section h2 {
+  font-size: clamp(2.5rem, 3.5vw, 4rem);
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 1rem;
+}
+
+.how-intro {
+  max-width: 520px;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 5rem;
+}
+
+.rl-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 5rem;
+  align-items: center;
+}
+
+.rl-image-wrap {
+  position: relative;
+}
+
+.rl-image-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -1.5rem;
+  border: 1px solid rgba(200,169,110,0.15);
+  pointer-events: none;
+}
+
+.rl-image-wrap img {
+  width: 100%;
+  display: block;
+  filter: brightness(0.9) saturate(0.8);
+}
+
+.rl-image-caption {
+  margin-top: 1rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+  text-align: center;
+}
+
+.rl-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.rl-item {
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.5rem;
+  align-items: flex-start;
+  cursor: default;
+  transition: padding 0.3s;
+}
+
+.rl-item:first-child { border-top: 1px solid var(--border); }
+
+.rl-item:hover { padding-left: 0.5rem; }
+
+.rl-icon {
+  width: 40px; height: 40px;
+  border: 1px solid rgba(200,169,110,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.rl-item:hover .rl-icon {
+  background: rgba(200,169,110,0.1);
+  border-color: var(--accent);
+}
+
+.rl-icon i {
+  font-size: 0.9rem;
+  color: var(--accent);
+}
+
+.rl-item-content h4 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--white);
+  margin-bottom: 0.4rem;
+}
+
+.rl-item-content p {
+  font-size: 0.875rem;
+  color: rgba(255,255,255,0.35);
+  line-height: 1.65;
+}
+
+/* ─── ABSTRACT DIVIDER ─── */
+.abstract-divider {
+  background: var(--black);
+  padding: 5rem 6rem;
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.abstract-divider::after {
+  content: 'THINK AHEAD';
+  position: absolute;
+  right: 3rem;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 8rem;
+  font-weight: 800;
+  color: rgba(200,169,110,0.04);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--accent), transparent);
+}
+
+.divider-quote {
+  max-width: 550px;
+}
+
+.divider-quote blockquote {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(1.5rem, 2.5vw, 2.5rem);
+  font-weight: 600;
+  font-style: italic;
+  color: var(--white);
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.divider-quote blockquote em { color: var(--accent); font-style: normal; }
+
+/* ─── USE CASE / CASE STUDY ─── */
+.cases-section {
+  padding: 8rem 6rem;
+  background: var(--section-light);
+}
+
+.cases-header {
+  margin-bottom: 5rem;
+}
+
+.cases-header h2 {
+  font-size: clamp(2.5rem, 3.5vw, 4rem);
+  text-transform: uppercase;
+  color: var(--black);
+  margin-bottom: 1rem;
+}
+
+.cases-header p {
+  max-width: 500px;
+  color: var(--muted);
+}
+
+.case-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #d8d5ce;
+  margin-bottom: 3rem;
+}
+
+.case-tab {
+  padding: 0.75rem 1.5rem;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.2s, border-color 0.2s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  white-space: nowrap;
+}
+
+.case-tab.active {
+  color: var(--black);
+  border-bottom-color: var(--accent-dark);
+}
+
+.case-panel {
+  display: none;
+}
+
+.case-panel.active { display: grid; }
+
+.case-grid {
+  grid-template-columns: 1.2fr 1fr;
+  gap: 5rem;
+  align-items: start;
+}
+
+.case-content .case-number {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+  margin-bottom: 1.5rem;
+}
+
+.case-content h3 {
+  font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+  text-transform: uppercase;
+  color: var(--black);
+  margin-bottom: 1.5rem;
+  line-height: 1;
+}
+
+.case-content .case-desc {
+  font-size: 0.95rem;
+  color: var(--muted);
+  margin-bottom: 2.5rem;
+  max-width: 500px;
+}
+
+/* Scenario narrative */
+.scenario-box {
+  background: var(--black);
+  padding: 2rem 2.5rem;
+  margin-bottom: 2rem;
+  border-left: 3px solid var(--accent);
+  position: relative;
+}
+
+.scenario-box::before {
+  content: 'SCENARIO';
+  position: absolute;
+  top: -0.6rem;
+  left: 2.5rem;
+  background: var(--black);
+  padding: 0 0.5rem;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+}
+
+.scenario-box p {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.55);
+  font-style: italic;
+  line-height: 1.7;
+}
+
+.solution-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 2.5rem;
+}
+
+.solution-step {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  padding: 1.25rem 0;
+  border-top: 1px solid #e0ddd8;
+}
+
+.solution-step:last-child { border-bottom: 1px solid #e0ddd8; }
+
+.step-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--accent-dark);
+  min-width: 28px;
+  padding-top: 2px;
+}
+
+.step-body h5 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--black);
+  margin-bottom: 0.25rem;
+}
+
+.step-body p {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.case-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.result-card {
+  background: var(--white);
+  border: 1px solid #e0ddd8;
+  border-top: none;
+  padding: 1.5rem 2rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  transition: background 0.25s;
+}
+
+.result-card:first-child { border-top: 1px solid #e0ddd8; }
+.result-card:hover { background: var(--cream); }
+
+.result-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--accent-dark);
+  line-height: 1;
+  min-width: 100px;
+}
+
+.result-desc h5 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--black);
+  margin-bottom: 0.25rem;
+}
+
+.result-desc p {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.case-visual {
+  position: sticky;
+  top: 7rem;
+}
+
+.case-visual-diagram {
+  background: var(--black);
+  padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.case-visual-diagram::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(200,169,110,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,169,110,0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+.cvd-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Mini RL loop visual */
+.mini-loop {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.loop-node {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.2rem;
+  border: 1px solid rgba(200,169,110,0.15);
+  background: rgba(200,169,110,0.04);
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.loop-node.active-node {
+  border-color: rgba(200,169,110,0.4);
+  background: rgba(200,169,110,0.1);
+}
+
+.loop-node i {
+  font-size: 0.85rem;
+  color: var(--accent);
+  min-width: 20px;
+  text-align: center;
+}
+
+.loop-node-text h6 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--white);
+}
+
+.loop-node-text p {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.3);
+  line-height: 1.4;
+}
+
+.loop-arrow {
+  padding-left: 2rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(200,169,110,0.4);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.loop-arrow::before {
+  content: '';
+  width: 1px;
+  height: 20px;
+  background: rgba(200,169,110,0.2);
+  margin-right: 0.25rem;
+}
+
+/* ─── TECHNOLOGY STACK ─── */
+.tech-section {
+  background: var(--black);
+  padding: 8rem 6rem;
+}
+
+.tech-section h2 {
+  font-size: clamp(2.5rem, 3.5vw, 4rem);
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 1rem;
+}
+
+.tech-intro {
+  color: rgba(255,255,255,0.35);
+  max-width: 500px;
+  margin-bottom: 4rem;
+}
+
+.tech-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border: 1px solid var(--border);
+}
+
+.tech-pillar {
+  padding: 2.5rem;
+  border-right: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+
+.tech-pillar:last-child { border-right: none; }
+
+.tech-pillar::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+.tech-pillar:hover { background: rgba(200,169,110,0.04); }
+.tech-pillar:hover::after { width: 100%; }
+
+.tech-pillar-icon {
+  width: 48px; height: 48px;
+  border: 1px solid rgba(200,169,110,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.tech-pillar-icon i {
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+.tech-pillar h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 0.75rem;
+}
+
+.tech-pillar p {
+  font-size: 0.875rem;
+  color: rgba(255,255,255,0.35);
+  line-height: 1.65;
+}
+
+.tech-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.5rem;
+}
+
+.tech-tag {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(200,169,110,0.6);
+  border: 1px solid rgba(200,169,110,0.2);
+  padding: 0.2rem 0.6rem;
+}
+
+/* ─── MANIFESTO STRIP ─── */
+.manifesto-strip {
+  background: var(--accent);
+  padding: 4rem 6rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4rem;
+  align-items: center;
+}
+
+.manifesto-strip h2 {
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  text-transform: uppercase;
+  color: var(--black);
+  max-width: 700px;
+}
+
+.manifesto-strip h2 em {
+  font-style: normal;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+
+/* ─── CTA ─── */
+.cta-section {
+  background: var(--charcoal);
+  padding: 7rem 6rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4rem;
+  align-items: center;
+}
+
+.cta-section h2 {
+  font-size: clamp(2rem, 3.5vw, 3.5rem);
+  color: var(--white);
+  text-transform: uppercase;
+  max-width: 650px;
+}
+
+.cta-section h2 em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--accent);
+}
+
+.cta-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 200px;
+}
+
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 1rem 2rem;
+  background: #25D366;
+  color: var(--white);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.btn-whatsapp:hover { background: #1ab555; }
+
+/* ─── SCROLL REVEAL ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1100px) {
+  .section, .section-sm { padding: 6rem 3rem; }
+  .hero { grid-template-columns: 1fr; min-height: auto; }
+  .hero-left { padding: 5rem 3rem 3rem; }
+  .hero-right { padding: 3rem 3rem 5rem; }
+  .intel-visual { max-width: 300px; }
+  .decision-section, .how-section, .cases-section, .tech-section { padding: 6rem 3rem; }
+  .manifesto-strip, .cta-section { padding: 5rem 3rem; }
+  .rl-layout { grid-template-columns: 1fr; gap: 3rem; }
+  .case-grid { gap: 3rem; }
+}
+
+@media (max-width: 900px) {
+  nav { padding: 0 1.5rem; }
+  .hero-left { padding: 4rem 2rem 2rem; }
+  .hero-right { display: none; }
+  .section-header-split { grid-template-columns: 1fr; gap: 1.5rem; }
+  .comparison-block { grid-template-columns: 1fr; }
+  .comparison-col.traditional { border-right: none; border-bottom: 1px solid #d8d5ce; }
+  .case-panel.active { display: flex; flex-direction: column; }
+  .tech-pillars { grid-template-columns: 1fr; }
+  .tech-pillar { border-right: none; border-bottom: 1px solid var(--border); }
+  .tech-pillar:last-child { border-bottom: none; }
+  .manifesto-strip, .cta-section { grid-template-columns: 1fr; gap: 2rem; }
+  .hero-metrics { flex-wrap: wrap; gap: 1.5rem; }
+  .decision-section, .how-section, .cases-section, .tech-section { padding: 5rem 2rem; }
+  .manifesto-strip, .cta-section { padding: 4rem 2rem; }
+  .case-tabs { overflow-x: auto; }
+}
+
+@media (max-width: 600px) {
+  .hero-left { padding: 4rem 1.5rem 2rem; }
+  .decision-section, .how-section, .cases-section, .tech-section { padding: 4rem 1.5rem; }
+  .manifesto-strip, .cta-section { padding: 3rem 1.5rem; }
+  .hero-actions { flex-direction: column; }
+  .comparison-col { padding: 2rem; }
+  .abstract-divider { padding: 3rem 1.5rem; }
+  .case-results { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <span class="nav-logo-text">Zero Eleven</span>
+  </a>
+  <a href="index.html" class="nav-back">
+    <i class="fas fa-arrow-left"></i> Back to Home
+  </a>
+  <a href="https://api.whatsapp.com/send?phone=6281243953947" target="_blank" class="nav-cta-btn">
+    <i class="fab fa-whatsapp"></i> Talk to Us
+  </a>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-breadcrumb">
+      <span class="bc-parent">Capabilities</span>
+      <span class="bc-sep">/</span>
+      <span class="bc-current">01</span>
+    </div>
+
+    <div class="capability-badge">
+      <div class="badge-dot"></div>
+      <span>Autonomous Decision Intelligence</span>
+    </div>
+
+    <h1>
+      Systems<br>
+      That Think<br>
+      <em>Ahead</em>
+    </h1>
+
+    <p class="hero-subhead">"Self-learning control systems that evolve with your operations."</p>
+
+    <div class="hero-metrics">
+      <div class="hero-metric">
+        <div class="hm-num">78%</div>
+        <div class="hm-label">Downtime Reduction</div>
+      </div>
+      <div class="hero-metric">
+        <div class="hm-num">&lt;50ms</div>
+        <div class="hm-label">Decision Latency</div>
+      </div>
+      <div class="hero-metric">
+        <div class="hm-num">24/7</div>
+        <div class="hm-label">Continuous Learning</div>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a href="#cases" class="btn-primary">See Real Cases <i class="fas fa-arrow-down"></i></a>
+      <a href="#how-it-works" class="btn-ghost">How It Works</a>
+    </div>
+  </div>
+
+  <!-- Abstract Intelligence Visual -->
+  <div class="hero-right">
+    <div class="intel-visual">
+      <!-- Rings -->
+      <div class="intel-ring"></div>
+      <div class="intel-ring"></div>
+      <div class="intel-ring"></div>
+
+      <!-- Core -->
+      <div class="intel-core">
+        <div class="intel-core-inner">
+          <i class="fas fa-brain"></i>
+        </div>
+      </div>
+
+      <!-- Node labels (abstract) -->
+      <div style="position:absolute;top:10%;left:55%;transform:translate(-50%,-50%)">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.55rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(200,169,110,0.5)">Policy</span>
+      </div>
+      <div style="position:absolute;top:82%;left:60%;transform:translate(-50%,-50%)">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.55rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(200,169,110,0.5)">Reward</span>
+      </div>
+      <div style="position:absolute;top:50%;left:5%;transform:translate(0,-50%)">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.55rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(200,169,110,0.5)">State</span>
+      </div>
+      <div style="position:absolute;top:50%;right:0%;transform:translate(0,-50%)">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.55rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(200,169,110,0.5)">Action</span>
+      </div>
+      <div style="position:absolute;top:25%;left:12%;transform:translate(0,-50%)">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.55rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(200,169,110,0.3)">Environment</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── DECISION COMPARISON ─── -->
+<section class="decision-section reveal" id="comparison">
+  <div class="section-header-split">
+    <div>
+      <span class="label" style="color:var(--accent-dark)">The Shift</span>
+      <h2 style="color:var(--black)">From Reactive<br>To Intelligent</h2>
+    </div>
+    <p>Traditional operations wait for problems to surface. Autonomous Decision Intelligence anticipates, adapts, and acts — before humans even detect a signal.</p>
+  </div>
+
+  <div class="comparison-block">
+    <!-- Traditional -->
+    <div class="comparison-col traditional">
+      <div class="comp-tag trad">
+        <i class="fas fa-times-circle"></i>
+        <span>Traditional Decision Making</span>
+      </div>
+      <h3>Reactive &<br>Fragmented</h3>
+      <p>Decisions are made after the fact — when data is already stale, exceptions have escalated, and the cost of action has multiplied.</p>
+
+      <ul class="comp-list">
+        <li>
+          <i class="fas fa-minus"></i>
+          <span>Rules set once, never adapted — rigid and brittle as conditions change</span>
+        </li>
+        <li>
+          <i class="fas fa-minus"></i>
+          <span>Human-dependent: bottlenecked by shift patterns, fatigue, and availability</span>
+        </li>
+        <li>
+          <i class="fas fa-minus"></i>
+          <span>Siloed data with no unified view — decisions made in partial darkness</span>
+        </li>
+        <li>
+          <i class="fas fa-minus"></i>
+          <span>Alerts only after threshold breach — you respond to damage, not probability</span>
+        </li>
+        <li>
+          <i class="fas fa-minus"></i>
+          <span>No compounding learning — the same mistakes repeat across cycles</span>
+        </li>
+      </ul>
+
+      <div class="comp-image-wrap">
+        <img src="sources/decision-making.png" alt="Traditional vs Decision Intelligence Diagram">
+      </div>
+      <p style="font-size:0.7rem;color:#bbb;margin-top:0.75rem;font-style:italic;letter-spacing:0.05em">↑ Chaotic path to insight vs. structured intelligence loop</p>
+    </div>
+
+    <!-- Intelligent -->
+    <div class="comparison-col intelligent">
+      <div class="comp-tag intel">
+        <i class="fas fa-check-circle"></i>
+        <span>Autonomous Decision Intelligence</span>
+      </div>
+      <h3>Predictive &<br>Self-Evolving</h3>
+      <p>The system sees what's coming. It collects signals, visualizes patterns, and surfaces insights — then acts on its own learned policy.</p>
+
+      <ul class="comp-list">
+        <li>
+          <i class="fas fa-check"></i>
+          <span>Self-updating models that evolve with every new operational cycle</span>
+        </li>
+        <li>
+          <i class="fas fa-check"></i>
+          <span>Machine-speed decisions — sub-50ms response across entire system states</span>
+        </li>
+        <li>
+          <i class="fas fa-check"></i>
+          <span>Unified sensor streams fused into a single operational intelligence layer</span>
+        </li>
+        <li>
+          <i class="fas fa-check"></i>
+          <span>Probabilistic forecasting — acts on likelihood, not just confirmed events</span>
+        </li>
+        <li>
+          <i class="fas fa-check"></i>
+          <span>Compounds intelligence over time — the longer it runs, the smarter it gets</span>
+        </li>
+      </ul>
+
+      <div class="comp-image-wrap" style="margin-top:2.5rem">
+        <img src="sources/decision-making.png" alt="Decision Intelligence Workflow">
+      </div>
+      <p style="font-size:0.7rem;color:rgba(200,169,110,0.45);margin-top:0.75rem;font-style:italic;letter-spacing:0.05em">↑ Collect → Visualise → Insights: the intelligence pipeline</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ABSTRACT DIVIDER ─── -->
+<div class="abstract-divider">
+  <div class="divider-line"></div>
+  <div class="divider-quote">
+    <blockquote>
+      "The machine does not wait.<br>
+      It learns from every cycle,<br>
+      every deviation, every <em>outcome</em>."
+    </blockquote>
+  </div>
+</div>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section class="how-section reveal" id="how-it-works">
+  <span class="label" style="display:block;margin-bottom:1rem">The Mechanism</span>
+  <h2>How the System<br>Learns to Decide</h2>
+  <p class="how-intro">Powered by Reinforcement Learning — a continuous feedback loop where the AI agent learns optimal decisions by interacting with your operational environment.</p>
+
+  <div class="rl-layout">
+    <!-- RL Diagram Image -->
+    <div class="rl-image-wrap reveal">
+      <img src="sources/reinforcementLearning-workflow.png" alt="Reinforcement Learning Loop — Agent, Policy, Environment">
+      <p class="rl-image-caption">Reinforcement Learning Feedback Loop · Zero Eleven ADI Framework</p>
+    </div>
+
+    <!-- Breakdown of RL concepts -->
+    <div class="rl-breakdown reveal" style="transition-delay:0.15s">
+
+      <div class="rl-item">
+        <div class="rl-icon"><i class="fas fa-robot"></i></div>
+        <div class="rl-item-content">
+          <h4>The Agent</h4>
+          <p>Your AI control system. Embedded directly into the operational layer, it observes the current state of the environment — temperatures, pressures, throughput, load — and prepares to act.</p>
+        </div>
+      </div>
+
+      <div class="rl-item">
+        <div class="rl-icon"><i class="fas fa-map"></i></div>
+        <div class="rl-item-content">
+          <h4>Policy</h4>
+          <p>The Agent's decision rulebook — continuously updated. Policy defines how the system responds to any given state. Over time, it becomes increasingly precise and nuanced.</p>
+        </div>
+      </div>
+
+      <div class="rl-item">
+        <div class="rl-icon"><i class="fas fa-bolt"></i></div>
+        <div class="rl-item-content">
+          <h4>Action</h4>
+          <p>Based on its policy, the Agent executes a decision — adjusting a valve, rerouting a logistics path, flagging an anomaly, triggering a shutdown. No human required.</p>
+        </div>
+      </div>
+
+      <div class="rl-item">
+        <div class="rl-icon"><i class="fas fa-industry"></i></div>
+        <div class="rl-item-content">
+          <h4>Environment</h4>
+          <p>Your operational reality: machines, systems, supply chains. It responds to every action, changing its state — sending new signals back to the Agent.</p>
+        </div>
+      </div>
+
+      <div class="rl-item">
+        <div class="rl-icon"><i class="fas fa-star"></i></div>
+        <div class="rl-item-content">
+          <h4>Reward Signal</h4>
+          <p>The outcome of each decision is scored. Did efficiency improve? Was the fault avoided? This signal trains the Learning Algorithm to refine its policy — compounding intelligence with every cycle.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── USE CASES ─── -->
+<section class="cases-section reveal" id="cases">
+  <div class="cases-header">
+    <span class="label" style="color:var(--accent-dark);display:block;margin-bottom:1rem">Real-World Applications</span>
+    <h2 style="color:var(--black)">The System at Work</h2>
+    <p>How Autonomous Decision Intelligence behaves across three high-impact industrial scenarios.</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="case-tabs">
+    <button class="case-tab active" onclick="switchCase(0)">Heavy Equipment</button>
+    <button class="case-tab" onclick="switchCase(1)">Manufacturing Line</button>
+    <button class="case-tab" onclick="switchCase(2)">Supply Chain</button>
+  </div>
+
+  <!-- Case 1: Mining Heavy Equipment -->
+  <div class="case-panel active case-grid" id="case-0">
+    <div class="case-content">
+      <div class="case-number">Case Study · 01</div>
+      <h3>Mining Equipment<br>Failure Prevention</h3>
+      <p class="case-desc">A large nickel mining operation faces unpredictable failures in haul trucks. Each unplanned stoppage costs $120,000/hour in lost production. Traditional alerts arrive only after the failure has begun.</p>
+
+      <div class="scenario-box">
+        <p>It's 03:40 on a Tuesday. A haul truck's engine temperature begins trending 0.3°C above its 14-day baseline. Vibration frequency shifts 2Hz outside normal range. A human operator won't notice until 06:00 — when the shift changes and logs are reviewed. By then, the bearing is already degraded.</p>
+      </div>
+
+      <div class="solution-steps">
+        <div class="solution-step">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h5>State Observed</h5>
+            <p>The AI Agent reads 240 sensor streams in real time — temperature, vibration, oil viscosity, RPM variance — building a live operational state map.</p>
+          </div>
+        </div>
+        <div class="solution-step">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h5>Pattern Recognized</h5>
+            <p>The learned policy identifies the multi-signal signature of bearing degradation — a pattern invisible in any single sensor, visible only in combination.</p>
+          </div>
+        </div>
+        <div class="solution-step">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h5>Action Executed</h5>
+            <p>At 03:47, the Agent flags the truck for priority maintenance, notifies the on-call engineer, and reroutes load allocation to two available trucks automatically.</p>
+          </div>
+        </div>
+        <div class="solution-step">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h5>Reward & Learning</h5>
+            <p>Maintenance confirms pre-failure bearing wear at 06:00. The reward signal reinforces the detection pattern — making the next identification 11% faster.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="case-visual">
+      <div class="cvd-label">ADI Loop — Live Inference</div>
+      <div class="case-visual-diagram">
+        <div class="mini-loop">
+          <div class="loop-node active-node">
+            <i class="fas fa-microchip"></i>
+            <div class="loop-node-text">
+              <h6>Agent · Inference Active</h6>
+              <p>Monitoring 240 sensor streams in real time</p>
+            </div>
+          </div>
+          <div class="loop-arrow"><i class="fas fa-arrow-down"></i> reads policy</div>
+          <div class="loop-node active-node">
+            <i class="fas fa-map"></i>
+            <div class="loop-node-text">
+              <h6>Policy · Bearing Degradation Model</h6>
+              <p>Multi-signal failure signature matched</p>
+            </div>
+          </div>
+          <div class="loop-arrow"><i class="fas fa-arrow-down"></i> triggers action</div>
+          <div class="loop-node">
+            <i class="fas fa-bolt"></i>
+            <div class="loop-node-text">
+              <h6>Action · Maintenance Alert</h6>
+              <p>Engineer notified · Load rerouted</p>
+            </div>
+          </div>
+          <div class="loop-arrow"><i class="fas fa-arrow-down"></i> observes outcome</div>
+          <div class="loop-node">
+            <i class="fas fa-industry"></i>
+            <div class="loop-node-text">
+              <h6>Environment · Response</h6>
+              <p>Truck taken offline · Zero unplanned downtime</p>
+            </div>
+          </div>
+          <div class="loop-arrow"><i class="fas fa-arrow-down"></i> reward signal</div>
+          <div class="loop-node">
+            <i class="fas fa-star"></i>
+            <div class="loop-node-text">
+              <h6>Reward · +High</h6>
+              <p>Policy reinforced · Model improves</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="case-results" style="margin-top:1.5px">
+        <div class="result-card">
+          <div class="result-num">78%</div>
+          <div class="result-desc">
+            <h5>Reduction in Unplanned Downtime</h5>
+            <p>Failures caught an average of 4.2 hours before impact</p>
+          </div>
+        </div>
+        <div class="result-card">
+          <div class="result-num">$2.1M</div>
+          <div class="result-desc">
+            <h5>Annual Cost Savings</h5>
+            <p>Across haul truck fleet — first 12 months of deployment</p>
+          </div>
+        </div>
+        <div class="result-card">
+          <div class="result-num">3.2×</div>
+          <div class="result-desc">
+            <h5>Extended Equipment Lifespan</h5>
+            <p>Optimized operating conditions reduce component wear</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Case 2: Manufacturing Line -->
+  <div class="case-panel case-grid" id="case-1">
+    <div class="case-content">
+      <div class="case-number">Case Study · 02</div>
+      <h3>Production Line<br>Self-Optimization</h3>
+      <p class="case-desc">A smartphone assembly line runs 24/7 across three shifts. Throughput varies ±18% across shifts due to operator performance, material batch variation, and machine drift — with no autonomous correction.</p>
+
+      <div class="scenario-box">
+        <p>Night shift. Machine 7's solder temperature drifts 2.1°C below spec due to ambient temperature drop. Defect rate climbs from 0.3% to 1.9% over 40 minutes. The shift supervisor will flag it during the morning quality review — 6 hours of borderline production later.</p>
+      </div>
+
+      <div class="solution-steps">
+        <div class="solution-step">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h5>State Observed</h5>
+            <p>The Agent monitors temperature, cycle time, defect signal, ambient conditions, and upstream material feed — 180 variables per machine, continuously.</p>
+          </div>
+        </div>
+        <div class="solution-step">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h5>Drift Detected</h5>
+            <p>Within 3 minutes of the temperature drift, the policy identifies the correlation with historical defect patterns and classifies it as a high-confidence deviation.</p>
+          </div>
+        </div>
+        <div class="solution-step">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h5>Autonomous Correction</h5>
+            <p>The Agent adjusts the solder station temperature setpoint by +2.3°C and flags the batch for re-inspection. No human intervention required. Defect rate returns to 0.3% within 4 minutes.</p>
+          </div>
+        </div>
+        <div class="solution-step">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h5>Model Reinforced</h5>
+            <p>The ambient-temperature / solder-drift pattern is added to the policy library. Future corrections happen in under 90 seconds — before defect rate moves at all.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="case-visual">
+      <div class="cvd-label">ADI Loop — Auto-Correction</div>
+      <div class="case-visual-diagram">
+        <div class="mini-loop">
+          <div class="loop-node active-node">
+            <i class="fas fa-microchip"></i>
+            <div class="loop-node-text">
+              <h6>Agent · Production Monitor</h6>
+              <p>180 variables per machine · real-time</p>
+            </div>
+          </div>
+          <div class="loop-arrow"><i class="fas fa-arrow-down"></i> reads policy</div>
+          <div class="loop-node active-node">
+            <i class="fas fa-map"></i>
+            <div class="loop-node-text">
+              <h6>Policy · Drift-Defect Correlation</h6>
+              <p>Ambient temp / solder drift signature matched</p>
+            </div>
+          </div>
+          <div class="loop-arrow"><i class="fas fa-arrow-down"></i> triggers action</div>
+          <div class="loop-node">
+            <i class="fas fa-bolt"></i>
+            <div class="loop-node-text">
+              <h6>Action · Setpoint Adjustment</h6>
+              <p>Solder temp corrected +2.3°C autonomously</p>
+            </div>
+          </div>
+          <div class="loop-arrow"><i class="fas fa-arrow-down"></i> observes outcome</div>
+          <div class="loop-node">
+            <i class="fas fa-industry"></i>
+            <div class="loop-node-text">
+              <h6>Environment · Line Response</h6>
+              <p>Defect rate returns to 0.3% · production continues</p>
+            </div>
+          </div>
+          <div class="loop-arrow"><i class="fas fa-arrow-down"></i> reward signal</div>
+          <div class="loop-node">
+            <i class="fas fa-star"></i>
+            <div class="loop-node-text">
+              <h6>Reward · +High</h6>
+              <p>Policy updated · future response under 90s</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="case-results" style="margin-top:1.5px">
+        <div class="result-card">
+          <div class="result-num">65%</div>
+          <div class="result-desc">
+            <h5>Reduction in Defect Rate</h5>
+            <p>Production quality stabilized across all shifts</p>
+          </div>
+        </div>
+        <div class="result-card">
+          <div class="result-num">99.8%</div>
+          <div class="result-desc">
+            <h5>Detection Accuracy</h5>
+            <p>Anomalies caught before human-visible defect threshold</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Case 3: Supply Chain -->
+  <div class="case-panel case-grid" id="case-2">
+    <div class="case-content">
+      <div class="case-number">Case Study · 03</div>
+      <h3>Logistics Route<br>Auto-Optimization</h3>
+      <p class="case-desc">A regional logistics operator runs 400+ daily delivery routes. Route plans are fixed 24 hours in advance — unable to respond to traffic, weather, or demand surges. On-time delivery hovers at 72%.</p>
+
+      <div class="scenario-box">
+        <p>A flash flood closes two arterial roads at 07:15. 34 active routes are now infeasible. The dispatch team begins manually rerouting — a 2.5-hour process. In the meantime, 18 high-priority deliveries are heading into gridlock with no alternative guidance.</p>
+      </div>
+
+      <div class="solution-steps">
+        <div class="solution-step">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h5>State Observed</h5>
+            <p>The Agent ingests road closure data, real-time traffic feeds, vehicle GPS, delivery priority scores, and weather forecasts — building a live network state.</p>
+          </div>
+        </div>
+        <div class="solution-step">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h5>Impact Modeled</h5>
+            <p>The policy calculates cascade impact across the route network — identifying the 18 critical deliveries at risk and computing 340+ alternative path combinations in 1.2 seconds.</p>
+          </div>
+        </div>
+        <div class="solution-step">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h5>Routes Rewritten</h5>
+            <p>Optimal alternative routes are pushed to all 34 affected driver apps within 90 seconds of the road closure — before any truck reaches the blocked road.</p>
+          </div>
+        </div>
+        <div class="solution-step">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h5>Learning Incorporated</h5>
+            <p>The flood-response routing strategy becomes a learned policy. Future disruptions of similar topology are resolved in under 30 seconds, with pre-positioned alternatives.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="case-visual">
+      <div class="cvd-label">ADI Loop — Dynamic Routing</div>
+      <div class="case-visual-diagram">
+        <div class="mini-loop">
+          <div class="loop-node active-node">
+            <i class="fas fa-microchip"></i>
+            <div class="loop-node-text">
+              <h6>Agent · Network Monitor</h6>
+              <p>400+ routes · live traffic · weather · GPS</p>
+            </div>
+          </div>
+          <div class="loop-arrow"><i class="fas fa-arrow-down"></i> reads policy</div>
+          <div class="loop-node active-node">
+            <i class="fas fa-map"></i>
+            <div class="loop-node-text">
+              <h6>Policy · Disruption Response</h6>
+              <p>Flood-closure impact cascade modeled</p>
+            </div>
+          </div>
+          <div class="loop-arrow"><i class="fas fa-arrow-down"></i> triggers action</div>
+          <div class="loop-node">
+            <i class="fas fa-bolt"></i>
+            <div class="loop-node-text">
+              <h6>Action · 34 Routes Rewritten</h6>
+              <p>Pushed to driver apps within 90 seconds</p>
+            </div>
+          </div>
+          <div class="loop-arrow"><i class="fas fa-arrow-down"></i> observes outcome</div>
+          <div class="loop-node">
+            <i class="fas fa-industry"></i>
+            <div class="loop-node-text">
+              <h6>Environment · Network Response</h6>
+              <p>On-time rate maintained at 94% despite disruption</p>
+            </div>
+          </div>
+          <div class="loop-arrow"><i class="fas fa-arrow-down"></i> reward signal</div>
+          <div class="loop-node">
+            <i class="fas fa-star"></i>
+            <div class="loop-node-text">
+              <h6>Reward · +High</h6>
+              <p>Response time now 30s for similar events</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="case-results" style="margin-top:1.5px">
+        <div class="result-card">
+          <div class="result-num">28%</div>
+          <div class="result-desc">
+            <h5>Faster Average Delivery</h5>
+            <p>Continuous route optimization beyond disruption events</p>
+          </div>
+        </div>
+        <div class="result-card">
+          <div class="result-num">22%</div>
+          <div class="result-desc">
+            <h5>Reduction in Operational Costs</h5>
+            <p>Fuel savings through intelligent route efficiency</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TECHNOLOGY PILLARS ─── -->
+<section class="tech-section reveal" id="technology">
+  <span class="label" style="display:block;margin-bottom:1rem">Under the Hood</span>
+  <h2>What Powers<br>the Intelligence</h2>
+  <p class="tech-intro">Three core technology disciplines fused into a single continuous-learning system.</p>
+
+  <div class="tech-pillars">
+    <div class="tech-pillar">
+      <div class="tech-pillar-icon"><i class="fas fa-graduation-cap"></i></div>
+      <h3>Reinforcement Learning</h3>
+      <p>The system learns from outcomes — not just from data. Every decision is evaluated, scored, and fed back into the model. Over time, the policy becomes more precise with each operational cycle.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">Policy Gradient</span>
+        <span class="tech-tag">Q-Learning</span>
+        <span class="tech-tag">Actor-Critic</span>
+      </div>
+    </div>
+
+    <div class="tech-pillar">
+      <div class="tech-pillar-icon"><i class="fas fa-wave-square"></i></div>
+      <h3>Time-Series Anomaly Detection</h3>
+      <p>Deep learning models trained on your specific operational baselines — detecting deviations that are statistically meaningful long before they manifest as observable symptoms.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">LSTM Networks</span>
+        <span class="tech-tag">Transformer Models</span>
+        <span class="tech-tag">Multivariate Analysis</span>
+      </div>
+    </div>
+
+    <div class="tech-pillar">
+      <div class="tech-pillar-icon"><i class="fas fa-network-wired"></i></div>
+      <h3>Edge-to-Cloud Intelligence</h3>
+      <p>Inference happens at the edge — sub-50ms decisions without cloud latency. Models are updated centrally and distributed continuously, keeping every node current with the latest learned policy.</p>
+      <div class="tech-tags">
+        <span class="tech-tag">Edge Inference</span>
+        <span class="tech-tag">OTA Model Updates</span>
+        <span class="tech-tag">Federated Learning</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MANIFESTO STRIP ─── -->
+<div class="manifesto-strip">
+  <h2>
+    The systems that will define the next decade of industry<br>
+    are not the ones that <em>respond fastest</em>.<br>
+    They are the ones that <em>learn continuously</em>.
+  </h2>
+  <a href="https://api.whatsapp.com/send?phone=6281243953947" target="_blank" class="btn-primary" style="background:var(--black);color:var(--white);white-space:nowrap">
+    Build Yours <i class="fas fa-arrow-right"></i>
+  </a>
+</div>
+
+<!-- ─── CTA ─── -->
+<div class="cta-section" id="contact">
+  <h2>Ready to Deploy <em>Intelligence</em> Into Your Operations?</h2>
+  <div class="cta-actions">
+    <a href="https://api.whatsapp.com/send?phone=6281243953947" target="_blank" class="btn-whatsapp">
+      <i class="fab fa-whatsapp"></i> Start a Conversation
+    </a>
+    <a href="index.html#process" class="btn-ghost" style="border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);justify-content:center">
+      See Our Process
+    </a>
+  </div>
+</div>
+
+<script>
+// Scroll Reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Tab switching
+function switchCase(idx) {
+  document.querySelectorAll('.case-tab').forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.case-panel').forEach((p, i) => {
+    p.classList.toggle('active', i === idx);
+  });
+}
+
+// Animate the RL loop nodes
+function animateLoop() {
+  const loops = document.querySelectorAll('.mini-loop');
+  loops.forEach(loop => {
+    const nodes = loop.querySelectorAll('.loop-node');
+    let current = 0;
+
+    function step() {
+      nodes.forEach(n => n.classList.remove('active-node'));
+      nodes[current].classList.add('active-node');
+      current = (current + 1) % nodes.length;
+    }
+
+    step();
+    setInterval(step, 1200);
+  });
+}
+
+animateLoop();
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+</body>
+</html>
